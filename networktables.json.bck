@@ -1,0 +1,34 @@
+[
+  {
+    "name": "/Preferences/FRONT_LEFT/Offset",
+    "type": "double",
+    "value": 149.854,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/FRONT_RIGHT/Offset",
+    "type": "double",
+    "value": 320.01,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/BACK_LEFT/Offset",
+    "type": "double",
+    "value": 228.164,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/BACK_RIGHT/Offset",
+    "type": "double",
+    "value": 179.561,
+    "properties": {
+      "persistent": true
+    }
+  }
+]

@@ -17,6 +17,7 @@ import frc.robot.subsystems.*;
  * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
  * Instead, the structure of the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
+
 public class RobotContainer
 {
 
@@ -60,7 +61,6 @@ public class RobotContainer
 
     }
 
-
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
@@ -71,6 +71,5 @@ public class RobotContainer
     {
         return superSecretMissileTech.getSelected();
     }
-
 
 }

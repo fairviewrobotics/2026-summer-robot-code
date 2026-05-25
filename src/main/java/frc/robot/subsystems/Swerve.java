@@ -112,4 +112,20 @@ public class Swerve extends SubsystemBase {
 
     }
 
+    @Override
+    public void simulationPeriodic() {
+        // Calculate the theoretical chassis speeds based on what the modules are currently doing
+        ChassisSpeeds chassisSpeeds = SwerveConstants.swerveDriveKinematics.toChassisSpeeds(
+                frontLeft.getState(),
+                frontRight.getState(),
+                backLeft.getState(),
+                backRight.getState()
+        );
+
+        // Update the NavX gyro simulation angle based on yaw rate (radians per second * dt)
+        double dt = 0.02; // 20ms standard loop
+        double angleDelta = chassisSpeeds.omegaRadiansPerSecond * dt;
+
+    }
+
 }
