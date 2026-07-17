@@ -164,14 +164,8 @@ public class Shooter extends SubsystemBase {
                 Math.abs(leftShooterMotor.getClosedLoopError().getValueAsDouble())
         );
 
-        Logger.recordOutput("Shooter/left motor rpm", leftShooterMotor.getVelocity().getValueAsDouble() * 60);
-        Logger.recordOutput("Shooter/right motor rpm", rightShooterMotor.getVelocity().getValueAsDouble() * 60);
-
-        Logger.recordOutput("Shooter/Current kP", lastKP);
-        Logger.recordOutput("Shooter/Current kI", lastKI);
-        Logger.recordOutput("Shooter/Current kD", lastKD);
-        Logger.recordOutput("Shooter/Current kV", lastKV);
-        Logger.recordOutput("Shooter/Current kS", lastKS);
+        Logger.recordOutput("Shooter/LEFT_MOTOR_RPM", leftShooterMotor.getVelocity().getValueAsDouble() * 60);
+        Logger.recordOutput("Shooter/RIGHT_MOTOR_RPM", rightShooterMotor.getVelocity().getValueAsDouble() * 60);
     }
 
     public void stopMotors() {

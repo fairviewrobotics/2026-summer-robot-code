@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ShootingConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
 
@@ -59,6 +60,10 @@ public class Hood extends SubsystemBase {
         double positionRadians = Units.degreesToRadians(position);
 
         hoodMotor.setControl(new PositionVoltage(positionRadians));
+    }
+
+    public void periodic() {
+        Logger.recordOutput("Hood/HOOD_POSITION", hoodMotor.getPosition().getValueAsDouble());
     }
 
     public void stopHood() {
