@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IntakeConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
@@ -66,6 +67,14 @@ public class Intake extends SubsystemBase {
         deployMotorConfig.Slot0.kP = Preferences.getDouble("Intake/kP", 0.0);
         deployMotorConfig.Slot0.kD = Preferences.getDouble("Intake/kD", 0.0);
         deployMotor.getConfigurator().apply(deployMotorConfig);
+    }
+
+    public void periodic(){
+        Logger.recordOutput("Intake/DEPLOY_MOTOR_POSITION", Units.rotationsToRadians(deployMotor.getPosition().getValueAsDouble()));
+        Logger.recordOutput("Intake/LEFT_ROLLOR_MOTOR_POSITION", Units.rotationsToRadians(leftRollerMotor.getPosition().getValueAsDouble()));
+        Logger.recordOutput("Intake/RIGHT_ROLLOR_MOTOR_POSITION", Units.rotationsToRadians(rightRollerMotor.getPosition().getValueAsDouble()));
+        Logger.recordOutput("Intake/LEFT_ROLLOR_MOTOR_VELOCITY", leftRollerMotor.getVelocity().getValueAsDouble() * 16);
+        Logger.recordOutput("Intake/RIGHT_ROLLOR_MOTOR_VELOCITY", rightRollerMotor.getVelocity().getValueAsDouble() * 16);
     }
 
 }
