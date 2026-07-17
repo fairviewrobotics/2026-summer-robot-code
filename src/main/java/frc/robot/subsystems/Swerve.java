@@ -82,12 +82,20 @@ public class Swerve extends SubsystemBase {
         poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);
     }
 
+    public ChassisSpeeds getFieldVelocity() {
+        return SwerveConstants.swerveDriveKinematics.toChassisSpeeds();
+    }
+
     public void zeroGyro() {
         gyro.reset();
     }
 
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        poseEstimator.resetPose(pose);
     }
 
     @Override
