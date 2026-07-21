@@ -39,6 +39,10 @@ public class FieldConstants {
     public static final Pose2d BLUE_DEPOT_PICKUP = new Pose2d(1.0, 5.936, Rotation2d.kPi);
     public static final Pose2d BLUE_DEPOT_TRANSITION = new Pose2d(1.7, 5.936, Rotation2d.kPi);
     public static final Pose2d BLUE_SELF_PASS_END_POINT = new Pose2d(5.75, 7.415, Rotation2d.kCCW_90deg);
+    public static final Pose2d BLUE_BUMP_LEFT_PASSAGE_POINT = new Pose2d(4.66,5.45, Rotation2d.fromDegrees(225));
+    public static final Pose2d BLUE_BUMP_LEFT_SHOOT_POINT = new Pose2d(3.5, 5.45, Rotation2d.fromDegrees(225));
+    public static final Pose2d BLUE_TRENCH_LEFT_SECOND_SWIPE_START = new Pose2d(6.1, 7.415, Rotation2d.kCW_90deg);
+    public static final Pose2d BLUE_TRENCH_LEFT_SECOND_SWIPE_END = new Pose2d(6.1, 3.9, Rotation2d.kCW_90deg);
     public static final Pose2d START_POINT = new Pose2d(0.783, 1.79, Rotation2d.kZero);
     public static final Pose2d TOP_RIGHT_POINT = new Pose2d(1.783,1.79, Rotation2d.kCCW_90deg);
     public static final Pose2d BOTTOM_RIGHT_POINT = new Pose2d(1.783,0.79, Rotation2d.k180deg);
