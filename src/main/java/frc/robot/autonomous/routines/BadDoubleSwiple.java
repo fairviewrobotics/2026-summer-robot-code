@@ -1,20 +1,14 @@
 package frc.robot.autonomous.routines;
 
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.commands.AimAtTarget;
-import frc.robot.commands.DriveToPoint;
-import frc.robot.commands.DriveToPointContinuous;
-import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.*;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.SwerveConstants;
-import frc.robot.subsystems.Hood;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.*;
 
 public class BadDoubleSwiple extends SequentialCommandGroup {
 
-    public BadDoubleSwiple(Swerve swerve, Hood hood, Shooter shooter, Intake intake) {
+    public BadDoubleSwiple(Swerve swerve, Hood hood, Shooter shooter, Intake intake, Hopper hopper) {
         addCommands(
             new InstantCommand(() -> swerve.resetOdometry(FieldConstants.BLUE_TRENCH_LEFT)),
             new DriveToPointContinuous(swerve, FieldConstants.BLUE_TRENCH_LEFT_INTAKE_START, SwerveConstants.MAX_SPEED),
@@ -28,7 +22,7 @@ public class BadDoubleSwiple extends SequentialCommandGroup {
             new ParallelDeadlineGroup(
                 new WaitCommand(4.0),
                 new AimAtTarget(shooter, hood, swerve, FieldConstants.BLUE_HUB_POSE3D::toPose2d, () -> 0.0, () -> 0.0),
-                new Hopper(hopper)
+                new HopperCommand(hopper, 4.0)
             ),
 
             new DriveToPointContinuous(swerve, FieldConstants.BLUE_BUMP_LEFT_DEPART, 1.0),
@@ -38,7 +32,7 @@ public class BadDoubleSwiple extends SequentialCommandGroup {
             new ParallelDeadlineGroup(
                 new WaitCommand(4.0),
                 new AimAtTarget(shooter, hood, swerve, FieldConstants.BLUE_HUB_POSE3D::toPose2d, () -> 0.0, () -> 0.0),
-                new Hopper(hopper)
+                new HopperCommand(hopper, 4.0)
             )
 
         );

@@ -27,6 +27,11 @@ public class FieldConstants {
     public static final Pose2d BLUE_BUMP_LEFT_RETURN = new Pose2d(5.596, 5.584, Rotation2d.kCW_90deg);
     public static final Pose2d BLUE_LEFT_SHOOT_POSE = new Pose2d(3.138, 5.584, new Rotation2d(2.291));
 
+    public static final Pose2d START_POINT = new Pose2d(0.783, 1.79, Rotation2d.kZero);
+    public static final Pose2d TOP_RIGHT_POINT = new Pose2d(1.783,1.79, Rotation2d.kCCW_90deg);
+    public static final Pose2d BOTTOM_RIGHT_POINT = new Pose2d(1.783,0.79, Rotation2d.k180deg);
+    public static final Pose2d BOTTOM_LEFT_POINT = new Pose2d(0.783,0.79, Rotation2d.kCCW_90deg);
+
     public static final Bounds TRENCH_BOUNDS = new Bounds(4, 5.25, 0, 8.5);
 
 }
