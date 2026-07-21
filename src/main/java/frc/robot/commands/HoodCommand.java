@@ -7,8 +7,8 @@ import frc.robot.subsystems.Hood;
 
 public class HoodCommand extends Command {
 
-    Hood hood;
-    double angle;
+    private final Hood hood;
+    private double angle;
 
     public HoodCommand(Hood hood, double angle) {
         this.hood = hood;

@@ -74,4 +74,8 @@ public class Hood extends SubsystemBase {
         hoodMotor.setPosition(0);
     }
 
+    public void setVoltage(double voltage) {
+        hoodMotor.setVoltage(voltage);
+    }
+
 }
