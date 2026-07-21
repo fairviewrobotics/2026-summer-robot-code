@@ -193,6 +193,8 @@ public class Shooter extends SubsystemBase {
         leftShooterMotor.setVoltage(voltage);
     }
 
+    public void setRightShooterMotorVoltage(double voltage) { rightShooterMotor.setVoltage(voltage); }
+
     public void setBothMotorsPreferences() {
         setLeftShooterMotor(Preferences.getDouble("Shooter/RPM_SETPOINT", ShootingConstants.SHOOTER_RPM));
         setRightShooterMotor(Preferences.getDouble("Shooter/RPM_SETPOINT", ShootingConstants.SHOOTER_RPM));

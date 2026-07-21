@@ -60,6 +60,7 @@ public class Intake extends SubsystemBase {
     private void initializePreferences() {
         Preferences.initDouble("Intake/kP", 0.0);
         Preferences.initDouble("Intake/kD", 0.0);
+        Preferences.initDouble("Deploy/TARGET_ANGLE", 0.0);
     }
 
     private void refreshPreferences() {
