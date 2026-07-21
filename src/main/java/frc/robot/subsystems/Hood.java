@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +17,9 @@ public class Hood extends SubsystemBase {
 
     public TalonFX hoodMotor = new TalonFX(ShootingConstants.HOOD_MOTOR_ID);
     public TalonFXConfiguration hoodMotorConfig = new TalonFXConfiguration();
+
+    private final InterpolatingDoubleTreeMap DistanceToAngle =
+            new InterpolatingDoubleTreeMap();
 
     public Hood() {
         initializePreferences();
@@ -35,6 +39,7 @@ public class Hood extends SubsystemBase {
 
         hoodMotorConfig.Slot0.kP = Preferences.getDouble("Hood/kP", 0.0);
         hoodMotorConfig.Slot0.kD = Preferences.getDouble("Hood/kD", 0.0);
+        createDistanceToAngleMap();
     }
 
     private void initializePreferences() {
@@ -74,8 +79,18 @@ public class Hood extends SubsystemBase {
         hoodMotor.setPosition(0);
     }
 
-    public void setVoltage(double voltage) {
-        hoodMotor.setVoltage(voltage);
+    private void createDistanceToAngleMap() {
+        DistanceToAngle.put(0.0, Math.toRadians(10));
+        DistanceToAngle.put(3.0796, Math.toRadians(20));
+        DistanceToAngle.put(4.1596, Math.toRadians(40));
+        DistanceToAngle.put(5.1396, Math.toRadians(60));
+        DistanceToAngle.put(6.0, Math.toRadians(80));
     }
+
+    public double getDistanceToAngle(double distance){
+        return DistanceToAngle.get(distance);
+    }
+
+
 
 }

@@ -20,6 +20,7 @@ public class AimAtTarget extends Command {
 
     Swerve swerve;
     Shooter shooter;
+    Hood hood;
     Supplier<Pose2d> target;
     DoubleSupplier xVel, yVel;
     ProfiledPIDController rotationPID;
@@ -27,6 +28,7 @@ public class AimAtTarget extends Command {
     public AimAtTarget(Shooter shooter, Hood hood, Swerve swerve, Supplier<Pose2d> target, DoubleSupplier xVel, DoubleSupplier yVel) {
         this.swerve = swerve;
         this.shooter = shooter;
+        this.hood = hood;
         this.xVel = xVel;
         this.yVel = yVel;
         this.rotationPID = new ProfiledPIDController(
@@ -58,6 +60,21 @@ public class AimAtTarget extends Command {
         double xParam = MathUtil.applyDeadband(xVel.getAsDouble(), 0.1) * SwerveConstants.MAX_SPEED;
         double yParam = MathUtil.applyDeadband(yVel.getAsDouble(), 0.1) * SwerveConstants.MAX_SPEED;
         swerve.drive(xParam, yParam, rotationOutput);
+        double distance = Math.hypot(
+                Math.abs(target.get().getX() - swerve.getPose().getX()),
+                Math.abs(target.get().getY() - swerve.getPose().getY()));
+        double RPM = shooter.getDistanceToRPMM(distance);
+        double angle = hood.getDistanceToAngle(distance);
+        shooter.setLeftShooterMotor(RPM);
+        shooter.setRightShooterMotor(RPM);
+        hood.setHoodPosition(angle);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        hood.setHoodPosition(0);
+        shooter.setLeftShooterMotor(2000);
+        shooter.setRightShooterMotor(2000);
     }
 
 }

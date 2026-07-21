@@ -209,9 +209,7 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    public double getDistanceToRPMMapLeft(double distance) {return DistanceToRPMLeft.get(distance);}
-    public double getDistanceToShotTimeLeft(double distance) {return DistanceToShotTimeLeft.get(distance);}
-    public double getDistanceToRPMMapRight(double distance) {return DistanceToRPMRight.get(distance);}
-    public double getDistanceToShotTimeRight(double distance) {return DistanceToShotTimeRight.get(distance);}
+    public double getDistanceToRPMM(double distance) {return DistanceToRPMLeft.get(distance);}
+    public double getDistanceToShotTime(double distance) {return DistanceToShotTimeLeft.get(distance);}
 
 }
