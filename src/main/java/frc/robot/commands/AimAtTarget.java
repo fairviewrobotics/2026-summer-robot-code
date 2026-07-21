@@ -9,6 +9,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.SwerveConstants;
+import frc.robot.subsystems.Hood;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
 import java.util.function.DoubleSupplier;
@@ -17,12 +19,14 @@ import java.util.function.Supplier;
 public class AimAtTarget extends Command {
 
     Swerve swerve;
+    Shooter shooter;
     Supplier<Pose2d> target;
     DoubleSupplier xVel, yVel;
     ProfiledPIDController rotationPID;
 
-    public AimAtTarget(Swerve swerve, Supplier<Pose2d> target, DoubleSupplier xVel, DoubleSupplier yVel) {
+    public AimAtTarget(Shooter shooter, Hood hood, Swerve swerve, Supplier<Pose2d> target, DoubleSupplier xVel, DoubleSupplier yVel) {
         this.swerve = swerve;
+        this.shooter = shooter;
         this.xVel = xVel;
         this.yVel = yVel;
         this.rotationPID = new ProfiledPIDController(
@@ -33,7 +37,7 @@ public class AimAtTarget extends Command {
         );
         rotationPID.enableContinuousInput(-Math.PI, Math.PI);
         rotationPID.setTolerance(Units.degreesToRadians(2.0));
-        addRequirements(swerve);
+        addRequirements(swerve, shooter);
     }
 
     @Override
