@@ -17,5 +17,5 @@ public class HoodVoltageCommand extends Command {
     public void execute() { hood.setVoltage(voltage); }
 
     @Override
-    public void end(boolean interrupted) { hood.setVoltage(0); }
+    public void end(boolean interrupted) { hood.setVoltage(0.0); }
 }

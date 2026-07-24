@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -40,11 +41,11 @@ public class DriveToPoint extends Command {
         this.targetLocationSupplier = targetLocationSupplier;
 
         Preferences.initDouble(AUTO_ROTATION_P_KEY, SwerveConstants.DRIVE_P);
-        Preferences.initDouble(DECELERATION_P_KEY, SwerveConstants.DRIVE_D);
+        Preferences.initDouble(DECELERATION_P_KEY, SwerveConstants.DRIVE_P);
 
         this.driveController =
                 new ProfiledPIDController(
-                        Preferences.getDouble(DECELERATION_P_KEY,SwerveConstants.DRIVE_D),
+                        Preferences.getDouble(DECELERATION_P_KEY, SwerveConstants.DRIVE_P),
                         0.0,
                         0.0,
                         new TrapezoidProfile.Constraints(
@@ -91,8 +92,10 @@ public class DriveToPoint extends Command {
                 Math.min(
                         0.0,
                         -new Translation2d(
-                                swerve.getFieldVelocity().vxMetersPerSecond,
-                                swerve.getFieldVelocity().vyMetersPerSecond)
+                                        swerve.getFieldVelocity()
+                                                .vxMetersPerSecond,
+                                        swerve.getFieldVelocity()
+                                                .vyMetersPerSecond)
                                 .rotateBy(
                                         targetLocation
                                                 .getTranslation()
@@ -103,10 +106,11 @@ public class DriveToPoint extends Command {
                                                 .getAngle()
                                                 .unaryMinus())
                                 .getX()));
+
         thetaController.reset(
                 currentPose.getRotation().getRadians(),
                 swerve.getFieldVelocity().omegaRadiansPerSecond);
-        thetaController.setTolerance(Units.degreesToRadians(2.0));
+        thetaController.setTolerance(Units.degreesToRadians(10.0));
 
         driveController.setTolerance(0.02);
     }
@@ -130,8 +134,8 @@ public class DriveToPoint extends Command {
         driveErrorAbs = currentDistance;
         Logger.recordOutput("DriveToPose/ffScalar", ffScalar);
         double driveVelocityScalar =
-                driveController.getSetpoint().velocity * ffScalar
-                        + driveController.calculate(driveErrorAbs, 0.0);
+                -(driveController.getSetpoint().velocity * ffScalar
+                        + driveController.calculate(driveErrorAbs, 0.0));
         if (currentDistance < driveController.getPositionTolerance()) driveVelocityScalar = 0.0;
 
         double thetaVelocity =
@@ -146,17 +150,17 @@ public class DriveToPoint extends Command {
 
         var translationMag = currentPose.getTranslation().minus(targetLocation.getTranslation());
 
-        var driveVelocity =
-                MathUtils.getPoseFromRotation(
-                                currentPose
-                                        .getTranslation()
-                                        .minus(targetLocation.getTranslation())
-                                        .getAngle())
-                        .transformBy(
-                                MathUtils.getTransform2dFromTranslation(
-                                        new Translation2d(driveVelocityScalar, 0.0)))
-                        .getTranslation();
-        Translation2d driveVals = new Translation2d(driveVelocity.getX(), driveVelocity.getY());
+        Rotation2d angleToTarget = targetLocation.getTranslation()
+        .minus(currentPose.getTranslation())
+        .getAngle();
+
+        // Calculate field-relative drive components directly
+        double vx = driveVelocityScalar * angleToTarget.getCos();
+
+
+        double vy = driveVelocityScalar * angleToTarget.getSin();
+
+        Translation2d driveVals = new Translation2d(vx, vy);
         swerve.drive(driveVals.getX(), driveVals.getY(), thetaVelocity);
     }
 

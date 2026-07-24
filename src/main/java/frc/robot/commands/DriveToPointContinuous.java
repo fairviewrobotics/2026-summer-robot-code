@@ -25,7 +25,7 @@ public class DriveToPointContinuous extends Command {
     private static final String AUTO_ROTATION_P_KEY = "DriveToPoint/AutoRotationP";
 
     public DriveToPointContinuous(
-            Swerve swerveSubsystem,
+            Swerve swerve,
             Supplier<Pose2d> targetLocationSupplier,
             double speedMetersPerSecond,
             double tolerance) {
@@ -67,6 +67,7 @@ public class DriveToPointContinuous extends Command {
 
     @Override
     public void initialize() {
+
         this.targetLocation = targetLocationSupplier.get();
 
         if (targetLocation == null) {
@@ -92,9 +93,6 @@ public class DriveToPointContinuous extends Command {
         Pose2d currentPose = swerve.getPose();
         Logger.recordOutput("DriveToPointContinuous/current pose", currentPose);
         Logger.recordOutput("DriveToPointContinuous/target location", targetLocation);
-
-        double currentDistance =
-                currentPose.getTranslation().getDistance(targetLocation.getTranslation());
 
         Rotation2d angleToTarget = targetLocation.getTranslation().minus(currentPose.getTranslation()).getAngle();
 
