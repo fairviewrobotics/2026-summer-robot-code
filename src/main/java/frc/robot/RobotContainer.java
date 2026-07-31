@@ -25,7 +25,7 @@ public class RobotContainer
     final CommandXboxController secondary_controller = new CommandXboxController(1);
     private final Swerve swerve = new Swerve();
     private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve);
-//    private final Vision vision = new Vision(swerve);
+    private final Vision vision = new Vision(swerve);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.

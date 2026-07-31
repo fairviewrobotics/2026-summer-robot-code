@@ -5,19 +5,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.ShootingConstants;
 import frc.robot.subsystems.Shooter;
 
-public class ShooterCommand extends Command {
+public class ShooterPreferencesCommand extends Command {
     private final Shooter shooterSubsystem;
-    private double RPM;
 
-    public ShooterCommand(Shooter shooterSubsystem, double RPM) {
+    public ShooterPreferencesCommand(Shooter shooterSubsystem, double RPM) {
         this.shooterSubsystem = shooterSubsystem;
-        this.RPM = RPM;
         addRequirements(shooterSubsystem);
     }
 
     @Override
     public void execute() {
-        shooterSubsystem.setMotorRPM(RPM);
+        double RPM = Preferences.getDouble("Shooter/RPM_SETPOINT", ShootingConstants.SHOOTER_RPM);
+        double shooterSetpoint = RPM * Preferences.getDouble("AimAtHub/SHOOTER_RPM_SCALAR", 1.0);
+        shooterSubsystem.setMotorRPM(shooterSetpoint);
     }
 
     @Override

@@ -58,13 +58,15 @@ public class Hood extends SubsystemBase {
 
     /**
      *
-     * @param position in degrees
+     * @param position in radians
      */
 
     public void setHoodPosition(double position) {
-        double positionRadians = Units.degreesToRadians(position);
+        hoodMotor.setControl(new PositionVoltage(position));
+    }
 
-        hoodMotor.setControl(new PositionVoltage(positionRadians));
+    public void setHoodVoltage(double voltage) {
+        hoodMotor.setVoltage(voltage);
     }
 
     public void periodic() {
