@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.studica.frc.AHRS;
-import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -14,7 +13,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.utils.SwerveModuleConfig;
@@ -29,19 +28,11 @@ public class Swerve extends SubsystemBase {
 
     private final AHRS gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
-    // Simulation fields for navX
-    private SimDeviceSim gyroSim;
-    private SimDouble gyroYawSim;
-
     public Swerve() {
         initializePreferences();
-
-        // Connect to the simulated navX device in HAL
-        gyroSim = new SimDeviceSim("navX-Sensor", gyro.getPort());
-        gyroYawSim = gyroSim.getDouble("Yaw");
     }
 
-    private final SwerveDrivePoseEstimator poseEstimator =
+     private final SwerveDrivePoseEstimator poseEstimator =
             new SwerveDrivePoseEstimator(
                     SwerveConstants.swerveDriveKinematics,
                     gyro.getRotation2d(),
@@ -60,7 +51,7 @@ public class Swerve extends SubsystemBase {
                 SwerveConstants.swerveDriveKinematics.toSwerveModuleStates(
                         ChassisSpeeds.discretize(
                                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                                        xVel, yVel, omega, getPose().getRotation()),
+                                        xVel, yVel, omega, gyro.getRotation2d()),
                                 0.02
                         )
                 );
@@ -91,17 +82,6 @@ public class Swerve extends SubsystemBase {
         poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);
     }
 
-    public ChassisSpeeds getFieldVelocity() {
-        ChassisSpeeds robotRelativeSpeeds = SwerveConstants.swerveDriveKinematics.toChassisSpeeds(
-                frontLeft.getState(),
-                frontRight.getState(),
-                backLeft.getState(),
-                backRight.getState()
-        );
-
-        return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, gyro.getRotation2d());
-    }
-
     public void zeroGyro() {
         gyro.reset();
     }
@@ -110,20 +90,17 @@ public class Swerve extends SubsystemBase {
         return poseEstimator.getEstimatedPosition();
     }
 
-    public void resetOdometry(Pose2d pose) {
-        poseEstimator.resetPose(pose);
-    }
-
     @Override
     public void periodic() {
+
         poseEstimator.update(
-                gyro.getRotation2d(),
-                new SwerveModulePosition[] {
-                        frontLeft.getPosition(),
-                        frontRight.getPosition(),
-                        backLeft.getPosition(),
-                        backRight.getPosition()
-                }
+            gyro.getRotation2d(),
+            new SwerveModulePosition[] {
+                    frontLeft.getPosition(),
+                    frontRight.getPosition(),
+                    backLeft.getPosition(),
+                    backRight.getPosition()
+            }
         );
 
         Logger.recordOutput("Swerve/Pose", getPose());
@@ -132,10 +109,12 @@ public class Swerve extends SubsystemBase {
                 frontRight.getState(),
                 backLeft.getState(),
                 backRight.getState());
+
     }
 
     @Override
     public void simulationPeriodic() {
+        // Calculate the theoretical chassis speeds based on what the modules are currently doing
         ChassisSpeeds chassisSpeeds = SwerveConstants.swerveDriveKinematics.toChassisSpeeds(
                 frontLeft.getState(),
                 frontRight.getState(),
@@ -143,11 +122,10 @@ public class Swerve extends SubsystemBase {
                 backRight.getState()
         );
 
-        double dt = 0.02; 
-        double angleDeltaDegrees = Units.radiansToDegrees(chassisSpeeds.omegaRadiansPerSecond * dt);
+        // Update the NavX gyro simulation angle based on yaw rate (radians per second * dt)
+        double dt = 0.02; // 20ms standard loop
+        double angleDelta = chassisSpeeds.omegaRadiansPerSecond * dt;
 
-        if (gyroYawSim != null) {
-            gyroYawSim.set(gyroYawSim.get() - angleDeltaDegrees);
-        }
     }
+
 }
