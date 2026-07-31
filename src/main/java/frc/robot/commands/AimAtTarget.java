@@ -9,8 +9,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.SwerveConstants;
-import frc.robot.subsystems.Hood;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
 import java.util.function.DoubleSupplier;
@@ -19,17 +17,12 @@ import java.util.function.Supplier;
 public class AimAtTarget extends Command {
 
     Swerve swerve;
-    Shooter shooter;
-    Hood hood;
     Supplier<Pose2d> target;
     DoubleSupplier xVel, yVel;
     ProfiledPIDController rotationPID;
 
-    public AimAtTarget(Shooter shooter, Hood hood, Swerve swerve, Supplier<Pose2d> target, DoubleSupplier xVel, DoubleSupplier yVel) {
+    public AimAtTarget(Swerve swerve, Supplier<Pose2d> target, DoubleSupplier xVel, DoubleSupplier yVel) {
         this.swerve = swerve;
-        this.shooter = shooter;
-        this.target = target;
-        this.hood = hood;
         this.xVel = xVel;
         this.yVel = yVel;
         this.rotationPID = new ProfiledPIDController(
@@ -40,7 +33,7 @@ public class AimAtTarget extends Command {
         );
         rotationPID.enableContinuousInput(-Math.PI, Math.PI);
         rotationPID.setTolerance(Units.degreesToRadians(2.0));
-        addRequirements(swerve, shooter);
+        addRequirements(swerve);
     }
 
     @Override
@@ -56,26 +49,11 @@ public class AimAtTarget extends Command {
 
     @Override
     public void execute() {
-        double targetAngle = target.get().getTranslation().minus(swerve.getPose().getTranslation()).getAngle().plus(Rotation2d.kPi).getRadians();
+        double targetAngle = target.get().minus(swerve.getPose()).getRotation().plus(Rotation2d.kPi).getRadians();
         double rotationOutput = rotationPID.calculate(swerve.getPose().getRotation().getRadians(), targetAngle);
         double xParam = MathUtil.applyDeadband(xVel.getAsDouble(), 0.1) * SwerveConstants.MAX_SPEED;
         double yParam = MathUtil.applyDeadband(yVel.getAsDouble(), 0.1) * SwerveConstants.MAX_SPEED;
         swerve.drive(xParam, yParam, rotationOutput);
-        double distance = Math.hypot(
-                Math.abs(target.get().getX() - swerve.getPose().getX()),
-                Math.abs(target.get().getY() - swerve.getPose().getY()));
-        double RPM = shooter.getDistanceToRPMM(distance);
-        double angle = hood.getDistanceToAngle(distance);
-        shooter.setLeftShooterMotor(RPM);
-        shooter.setRightShooterMotor(RPM);
-        hood.setHoodPosition(angle);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        hood.setHoodPosition(0);
-        shooter.setLeftShooterMotor(2000);
-        shooter.setRightShooterMotor(2000);
     }
 
 }
