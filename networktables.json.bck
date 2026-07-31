@@ -194,7 +194,7 @@
   {
     "name": "/Preferences/DriveToPoint/DecelerationP",
     "type": "double",
-    "value": 10.0,
+    "value": 30.0,
     "properties": {
       "persistent": true
     }

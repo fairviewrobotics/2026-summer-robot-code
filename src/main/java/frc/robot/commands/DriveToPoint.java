@@ -110,9 +110,9 @@ public class DriveToPoint extends Command {
         thetaController.reset(
                 currentPose.getRotation().getRadians(),
                 swerve.getFieldVelocity().omegaRadiansPerSecond);
-        thetaController.setTolerance(Units.degreesToRadians(10.0));
+        thetaController.setTolerance(Units.degreesToRadians(2.0));
 
-        driveController.setTolerance(0.02);
+        driveController.setTolerance(0.05);
     }
 
     @Override
@@ -154,9 +154,7 @@ public class DriveToPoint extends Command {
         .minus(currentPose.getTranslation())
         .getAngle();
 
-        // Calculate field-relative drive components directly
         double vx = driveVelocityScalar * angleToTarget.getCos();
-
 
         double vy = driveVelocityScalar * angleToTarget.getSin();
 

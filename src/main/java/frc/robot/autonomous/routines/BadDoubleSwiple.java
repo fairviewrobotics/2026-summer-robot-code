@@ -13,10 +13,10 @@ public class BadDoubleSwiple extends SequentialCommandGroup {
             new InstantCommand(() -> swerve.resetOdometry(FieldConstants.BLUE_TRENCH_LEFT)),
             new DriveToPointContinuous(swerve, FieldConstants.BLUE_TRENCH_LEFT_INTAKE_START, SwerveConstants.MAX_SPEED, 1),
             new ParallelDeadlineGroup(
-                new DriveToPoint(swerve, FieldConstants.BLUE_TRENCH_LEFT_INTAKE_END, 1.0),
+                new DriveToPointContinuous(swerve, FieldConstants.BLUE_TRENCH_LEFT_INTAKE_END, SwerveConstants.MAX_SPEED),
                 new IntakeCommand(intake)
             ),
-            new DriveToPoint(swerve, FieldConstants.BLUE_BUMP_LEFT_RETURN, 1.0),
+            new DriveToPointContinuous(swerve, FieldConstants.BLUE_BUMP_LEFT_RETURN, SwerveConstants.MAX_SPEED),
             new DriveToPoint(swerve, FieldConstants.BLUE_LEFT_SHOOT_POSE, 1.0),
 
             new ParallelDeadlineGroup(
@@ -25,9 +25,13 @@ public class BadDoubleSwiple extends SequentialCommandGroup {
                 new HopperCommand(hopper, 4.0)
             ),
 
-            new DriveToPointContinuous(swerve, FieldConstants.BLUE_BUMP_LEFT_DEPART, SwerveConstants.MAX_SPEED),
-            new DriveToPoint(swerve, FieldConstants.BLUE_BUMP_LEFT_RETURN, 1.0),
-            new DriveToPoint(swerve, FieldConstants.BLUE_LEFT_SHOOT_POSE, 1.0),
+            new ParallelDeadlineGroup(
+                new DriveToPointContinuous(swerve, FieldConstants.BLUE_BUMP_LEFT_DEPART, SwerveConstants.MAX_SPEED),
+                new IntakeCommand(intake)
+            ),   
+
+            new DriveToPointContinuous(swerve, FieldConstants.BLUE_BUMP_LEFT_RETURN, SwerveConstants.MAX_SPEED),
+            new DriveToPointContinuous(swerve, FieldConstants.BLUE_LEFT_SHOOT_POSE, SwerveConstants.MAX_SPEED),
 
             new ParallelDeadlineGroup(
                 new WaitCommand(4.0),

@@ -16,6 +16,7 @@ public class FieldConstants {
     public static final double BALL_HEIGHT_METERS = Units.inchesToMeters(6.0);
 
     public static final Pose3d BLUE_HUB_POSE3D = new Pose3d(4.62534,4.034663,1.822, Rotation3d.kZero);
+    public static final Pose2d BlUE_HUB_POSE = new Pose2d(4.625, 4.036, Rotation2d.kZero);
     public static final Pose3d RED_HUB_POSE3D = new Pose3d(4.62534 + 7.2898,4.034663,1.822, Rotation3d.kZero);
     public static final Pose2d BLUE_PASS_RIGHT_POSE = new Pose2d(2.4, 0.8, Rotation2d.kZero);
     public static final Pose2d BLUE_PASS_LEFT_POSE = new Pose2d(2.4, 7.2, Rotation2d.kZero);
@@ -32,7 +33,7 @@ public class FieldConstants {
     public static final Pose2d BLUE_TRENCH_LEFT_TRANSITION_CONTINUOUS = new Pose2d(5.0, 7.415, Rotation2d.kZero);
     public static final Pose2d BLUE_TRENCH_LEFT_TRANSITION_PICKUP = new Pose2d(7.657, 7.415, Rotation2d.kCW_90deg);
     public static final Pose2d BLUE_TRENCH_LEFT_TRANSITION_PICKUP_2 = new Pose2d(6.5, 7.415, Rotation2d.kCW_90deg);
-    public static final Pose2d BLUE_TRENCH_LEFT_TRANSITION_DROPOFF = new Pose2d(7.657, 7.415, Rotation2d.kZero);
+    public static final Pose2d BLUE_TRENCH_LEFT_TRANSITION_DROPOFF = new Pose2d(7.657, 4.6, Rotation2d.kCW_90deg);
     public static final Pose2d BLUE_TRENCH_LEFT_PICKUP_END = new Pose2d(7.805, 5.0, Rotation2d.kCW_90deg);
     public static final Pose2d BLUE_TRENCH_LEFT_ARC_DROPOFF = new Pose2d(5.2, 5.0, Rotation2d.k180deg);
     public static final Pose2d BLUE_TRENCH_LEFT_ARC_END_DROPOFF = new Pose2d(5.75, 5.0, Rotation2d.kCCW_90deg);
@@ -46,6 +47,8 @@ public class FieldConstants {
     public static final Pose2d BLUE_DEPOT_TRANSITION = new Pose2d(1.7, 5.936, Rotation2d.kPi);
     public static final Pose2d BLUE_SELF_PASS_END_POINT = new Pose2d(5.75, 7.415, Rotation2d.kCCW_90deg);
     public static final Pose2d BLUE_BUMP_LEFT_PASSAGE_POINT = new Pose2d(4.66,5.45, Rotation2d.fromDegrees(225));
+    public static final Pose2d BLUE_BUMP_LEFT_TRANSITION_POINT = new Pose2d(6.1, 5.45, Rotation2d.fromDegrees(225));
+    public static final Pose2d BLUE_TRENCH_LEFT_TRANSITION_POINT = new Pose2d(3.5,7.415, Rotation2d.kCW_90deg);
     public static final Pose2d BLUE_BUMP_LEFT_SHOOT_POINT = new Pose2d(3.5, 5.45, Rotation2d.fromDegrees(225));
     public static final Pose2d BLUE_TRENCH_LEFT_SECOND_SWIPE_START = new Pose2d(6.1, 7.415, Rotation2d.kCW_90deg);
     public static final Pose2d BLUE_TRENCH_LEFT_SECOND_SWIPE_END = new Pose2d(6.1, 3.9, Rotation2d.kCW_90deg);
