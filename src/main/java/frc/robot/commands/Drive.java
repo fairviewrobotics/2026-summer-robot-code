@@ -34,9 +34,10 @@ public class Drive extends Command {
         ySpeed = MathUtil.applyDeadband(ySpeed, 0.1);
         turningSpeed = MathUtil.applyDeadband(turningSpeed, 0.1);
 
-        double xVel = xSpeed * SwerveConstants.MAX_SPEED;
-        double yVel = ySpeed * SwerveConstants.MAX_SPEED;
-        double turningVel = turningSpeed * (Math.PI * 2);
+        // MoSim scaling
+        double xVel = xSpeed * SwerveConstants.MAX_SPEED * ((double) 3 /5);
+        double yVel = ySpeed * SwerveConstants.MAX_SPEED * ((double) 3 /5);
+        double turningVel = turningSpeed * (Math.PI * 2) * 0.5;
 
         swerve.drive(xVel, yVel, turningVel);
     }
