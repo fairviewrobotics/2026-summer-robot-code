@@ -4,10 +4,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Intake;
 
-public class DeplotIntakeCommand extends Command {
+public class DeployIntakeCommand extends Command {
     private final Intake intake;
 
-    public DeplotIntakeCommand(Intake intake){
+    public DeployIntakeCommand(Intake intake){
         this.intake = intake;
         addRequirements(intake);
     }
@@ -19,7 +19,7 @@ public class DeplotIntakeCommand extends Command {
 
     @Override
     public void end(boolean interrupted){
-        intake.setDeployMotor(0);
+        intake.setDeployMotorVoltage(0);
     }
 
 }
