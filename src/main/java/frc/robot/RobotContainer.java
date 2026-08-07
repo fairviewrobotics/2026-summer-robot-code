@@ -24,8 +24,12 @@ public class RobotContainer
     final CommandPS5Controller primary_controller = new CommandPS5Controller(0);
     final CommandXboxController secondary_controller = new CommandXboxController(1);
     private final Swerve swerve = new Swerve();
-    private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve);
-    private final Vision vision = new Vision(swerve);
+    private final Shooter shooter = new Shooter();
+    private final Hood hood = new Hood();
+    private final Intake intake = new Intake();
+    private final Hopper hopper = new Hopper();
+    private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve, hood, shooter, intake, hopper);
+//    private final Vision vision = new Vision(swerve);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
