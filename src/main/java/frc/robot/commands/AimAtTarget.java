@@ -28,6 +28,7 @@ public class AimAtTarget extends Command {
     public AimAtTarget(Shooter shooter, Hood hood, Swerve swerve, Supplier<Pose2d> target, DoubleSupplier xVel, DoubleSupplier yVel) {
         this.swerve = swerve;
         this.shooter = shooter;
+        this.target = target;
         this.hood = hood;
         this.xVel = xVel;
         this.yVel = yVel;
@@ -55,7 +56,7 @@ public class AimAtTarget extends Command {
 
     @Override
     public void execute() {
-        double targetAngle = target.get().minus(swerve.getPose()).getRotation().plus(Rotation2d.kPi).getRadians();
+        double targetAngle = target.get().getTranslation().minus(swerve.getPose().getTranslation()).getAngle().plus(Rotation2d.kPi).getRadians();
         double rotationOutput = rotationPID.calculate(swerve.getPose().getRotation().getRadians(), targetAngle);
         double xParam = MathUtil.applyDeadband(xVel.getAsDouble(), 0.1) * SwerveConstants.MAX_SPEED;
         double yParam = MathUtil.applyDeadband(yVel.getAsDouble(), 0.1) * SwerveConstants.MAX_SPEED;
