@@ -14,7 +14,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.utils.SwerveModuleConfig;
@@ -26,6 +28,7 @@ public class Swerve extends SubsystemBase {
     private final SwerveModule frontRight = new SwerveModule(SwerveConstants.FRONT_RIGHT_CONFIG);
     private final SwerveModule backLeft = new SwerveModule(SwerveConstants.BACK_LEFT_CONFIG);
     private final SwerveModule backRight = new SwerveModule(SwerveConstants.BACK_RIGHT_CONFIG);
+    private Field2d field = new Field2d();
 
     private final AHRS gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
@@ -127,6 +130,8 @@ public class Swerve extends SubsystemBase {
         );
 
         Logger.recordOutput("Swerve/Pose", getPose());
+        SmartDashboard.putData("Swerve/Field", field);
+        field.setRobotPose(poseEstimator.getEstimatedPosition());
         Logger.recordOutput("Swerve/ModuleStates",
                 frontLeft.getState(),
                 frontRight.getState(),
