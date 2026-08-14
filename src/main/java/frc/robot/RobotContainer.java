@@ -4,6 +4,7 @@
 
 package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -23,9 +24,13 @@ public class RobotContainer
 
     final CommandPS5Controller primary_controller = new CommandPS5Controller(0);
     final CommandXboxController secondary_controller = new CommandXboxController(1);
+    final CommandXboxController tertiary_controller = new CommandXboxController(2);
     private final Swerve swerve = new Swerve();
     private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve);
     private final Vision vision = new Vision(swerve);
+    private final Hood hood = new Hood();
+    private final Intake intake = new Intake();
+    private final Shooter shooter = new Shooter();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -55,9 +60,18 @@ public class RobotContainer
                         primary_controller::getRightX
                 )
         );
+
         primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
 
         secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve));
+
+        tertiary_controller.a().whileTrue(new HoodVoltageCommand(hood, 0));
+
+        tertiary_controller.b().whileTrue(new IntakeDeployVoltageCommand(intake, 0));
+
+        tertiary_controller.x().whileTrue(new IntakeRollerVoltageCommand(intake, 0));
+
+        tertiary_controller.y().whileTrue(new ShooterVoltageCommand(shooter, 0));
 
     }
 
