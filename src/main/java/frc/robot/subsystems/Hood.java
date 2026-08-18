@@ -91,6 +91,10 @@ public class Hood extends SubsystemBase {
         return DistanceToAngle.get(distance);
     }
 
+    public void setVoltage(double voltage){
+        hoodMotor.setVoltage(voltage);
+    }
+
 
 
 }

@@ -25,6 +25,7 @@ public class RobotContainer
     final CommandXboxController secondary_controller = new CommandXboxController(1);
     private final Swerve swerve = new Swerve();
     private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve);
+    private final Kicker kicker = new Kicker();
 //    private final Vision vision = new Vision(swerve);
 
     /**
@@ -47,18 +48,20 @@ public class RobotContainer
 
     private void configureBindings()
     {
-        swerve.setDefaultCommand(
-                new Drive(
-                        swerve,
-                        primary_controller::getLeftX,
-                        primary_controller::getLeftY,
-                        primary_controller::getRightX
-                )
-        );
-        primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
+//
+//        swerve.setDefaultCommand(
+//                new Drive(
+//                        swerve,
+//                        primary_controller::getLeftX,
+//                        primary_controller::getLeftY,
+//                        primary_controller::getRightX
+//                )
+//        );
+//        primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
 
-        secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve));
+        //secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve));
 
+        secondary_controller.x().whileTrue(new KickerCommand(kicker, -10));
     }
 
     /**
