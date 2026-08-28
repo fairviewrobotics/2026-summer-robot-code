@@ -26,6 +26,7 @@ public class RobotContainer
     private final Swerve swerve = new Swerve();
     private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve);
     private final Kicker kicker = new Kicker();
+    private final Intake intake = new Intake();
 //    private final Vision vision = new Vision(swerve);
 
     /**
@@ -62,6 +63,9 @@ public class RobotContainer
         //secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve));
 
         secondary_controller.x().whileTrue(new KickerCommand(kicker, -10));
+        secondary_controller.y().onTrue(new DeplotIntakeCommand(intake));
+        secondary_controller.a().whileTrue(new IntakeRollerVoltageCommand(intake, -8));
+        secondary_controller.b().onTrue(new DeplotIntakeCommand(intake));
     }
 
     /**

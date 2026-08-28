@@ -14,8 +14,8 @@ public class IntakeRollerVoltageCommand extends Command {
     }
 
     @Override
-    public void execute() { intake.setDeployMotorVoltage(voltage); }
+    public void execute() { intake.setIntakeRollerMotorVoltage(voltage); }
 
     @Override
-    public void end(boolean interrupted) { intake.setDeployMotorVoltage(0); }
+    public void end(boolean interrupted) { intake.setIntakeRollerMotorVoltage(0); }
 }

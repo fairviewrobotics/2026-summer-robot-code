@@ -19,7 +19,7 @@ public class DeplotIntakeCommand extends Command {
 
     @Override
     public void end(boolean interrupted){
-        intake.setDeployMotor(0);
+        intake.setDeployMotorVoltage(0);
     }
 
 }
