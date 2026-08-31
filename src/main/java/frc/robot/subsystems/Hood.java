@@ -77,6 +77,8 @@ public class Hood extends SubsystemBase {
         hoodMotor.stopMotor();
     }
 
+    public void setVoltage(double voltage) {hoodMotor.setVoltage(voltage);}
+
     public void resetHoodPosition() {
         hoodMotor.setPosition(0);
     }

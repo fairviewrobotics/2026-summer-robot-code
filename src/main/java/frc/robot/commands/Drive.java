@@ -30,8 +30,8 @@ public class Drive extends Command {
         double ySpeed = yVel.getAsDouble();
         double turningSpeed = omega.getAsDouble();
 
-        xSpeed = MathUtil.applyDeadband(xSpeed, 0.1);
-        ySpeed = MathUtil.applyDeadband(ySpeed, 0.1);
+        xSpeed = Math.pow(-MathUtil.applyDeadband(xSpeed, 0.1), 3);
+        ySpeed = Math.pow(MathUtil.applyDeadband(ySpeed, 0.1), 3);
         turningSpeed = MathUtil.applyDeadband(turningSpeed, 0.1);
 
         // MoSim scaling

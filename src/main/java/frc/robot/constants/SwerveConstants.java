@@ -32,19 +32,19 @@ public class SwerveConstants {
     public static final String BACK_RIGHT_MODULE_NAME = "BACK_RIGHT";
 
     // Hardware IDs
-    public static final int FRONT_LEFT_DRIVE_ID = 3;
-    public static final int FRONT_LEFT_TURNING_ID = 4;
-    public static final int FRONT_RIGHT_DRIVE_ID = 7;
-    public static final int FRONT_RIGHT_TURNING_ID = 8;
-    public static final int BACK_LEFT_DRIVE_ID = 1;
-    public static final int BACK_LEFT_TURNING_ID = 2;
-    public static final int BACK_RIGHT_DRIVE_ID = 5;
-    public static final int BACK_RIGHT_TURNING_ID = 6;
+    public static final int FRONT_LEFT_DRIVE_ID = 2;
+    public static final int FRONT_LEFT_TURNING_ID = 1;
+    public static final int FRONT_RIGHT_DRIVE_ID = 5;
+    public static final int FRONT_RIGHT_TURNING_ID = 6;
+    public static final int BACK_LEFT_DRIVE_ID = 7;
+    public static final int BACK_LEFT_TURNING_ID = 8;
+    public static final int BACK_RIGHT_DRIVE_ID = 3;
+    public static final int BACK_RIGHT_TURNING_ID = 4;
 
-    public static final int FRONT_LEFT_ENCODER_ID = 12;
-    public static final int FRONT_RIGHT_ENCODER_ID = 14;
-    public static final int BACK_LEFT_ENCODER_ID = 11;
-    public static final int BACK_RIGHT_ENCODER_ID = 13;
+    public static final int FRONT_LEFT_ENCODER_ID = 11;
+    public static final int FRONT_RIGHT_ENCODER_ID = 13;
+    public static final int BACK_LEFT_ENCODER_ID = 12;
+    public static final int BACK_RIGHT_ENCODER_ID = 14;
 
     // Inversions
     public static final boolean FRONT_LEFT_DRIVE_INVERTED = false;
@@ -52,10 +52,10 @@ public class SwerveConstants {
     public static final boolean BACK_LEFT_DRIVE_INVERTED = false;
     public static final boolean BACK_RIGHT_DRIVE_INVERTED = false;
 
-    public static final boolean FRONT_LEFT_TURNING_INVERTED = false;
-    public static final boolean FRONT_RIGHT_TURNING_INVERTED = false;
-    public static final boolean BACK_LEFT_TURNING_INVERTED = false;
-    public static final boolean BACK_RIGHT_TURNING_INVERTED = false;
+    public static final boolean FRONT_LEFT_TURNING_INVERTED = true;
+    public static final boolean FRONT_RIGHT_TURNING_INVERTED = true;
+    public static final boolean BACK_LEFT_TURNING_INVERTED = true;
+    public static final boolean BACK_RIGHT_TURNING_INVERTED = true;
 
 
     public static final double FRONT_LEFT_OFFSET_X = Units.inchesToMeters(11.0);
@@ -77,10 +77,10 @@ public class SwerveConstants {
     public static final Translation2d BACK_RIGHT_MODULE_POSE = new Translation2d(BACK_RIGHT_OFFSET_X, BACK_RIGHT_OFFSET_Y);
 
     // Absolute Encoder Offsets
-    public static final double FRONT_LEFT_ENCODER_OFFSET = 149.854;
-    public static final double FRONT_RIGHT_ENCODER_OFFSET = 320.01;
-    public static final double BACK_LEFT_ENCODER_OFFSET = 228.164;
-    public static final double BACK_RIGHT_ENCODER_OFFSET = 179.561;
+    public static final double FRONT_LEFT_ENCODER_OFFSET = 3.105;
+    public static final double FRONT_RIGHT_ENCODER_OFFSET = 2.752;
+    public static final double BACK_LEFT_ENCODER_OFFSET = 1.401;
+    public static final double BACK_RIGHT_ENCODER_OFFSET = 2.493;
 
     // --- Module Configurations ---
 

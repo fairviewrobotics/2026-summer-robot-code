@@ -61,7 +61,7 @@ public class RobotContainer
         );
         primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
 
-        secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve));
+        secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve, intake));
 
     }
 

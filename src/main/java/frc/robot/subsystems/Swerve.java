@@ -15,6 +15,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,6 +39,7 @@ public class Swerve extends SubsystemBase {
 
     public Swerve() {
         initializePreferences();
+        gyro.setAngleAdjustment(270);
 
         // Connect to the simulated navX device in HAL
         gyroSim = new SimDeviceSim("navX-Sensor", gyro.getPort());
