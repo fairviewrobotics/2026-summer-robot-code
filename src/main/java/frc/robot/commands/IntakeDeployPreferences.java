@@ -12,7 +12,10 @@ public class IntakeDeployPreferences extends Command {
 
         addRequirements(intake);
     }
-
+    @Override
+    public void initialize(){
+        intake.resetPID();
+    }
     @Override
     public void execute() { intake.setDeployMotor(Preferences.getDouble("Deploy/TARGET_ANGLE", 0.0)); }
 

@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
     SparkFlex leftRollerMotor = new SparkFlex(IntakeConstants.INTAKE_LEFT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
     SparkFlex rightRollerMotor = new SparkFlex(IntakeConstants.INTAKE_RIGHT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
     SparkFlex deployMotor = new SparkFlex(IntakeConstants.INTAKE_DEPLOY_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-    PIDController deployPid = new PIDController(0.0, 0.0, 0.0);
+    PIDController deployPid = new PIDController(0.01, 0.0, 0.0);
 
     public Intake() {
         SparkFlexConfig rollerMotorConfig = new SparkFlexConfig();
@@ -39,11 +39,13 @@ public class Intake extends SubsystemBase {
         rightRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         deployMotorConfig.smartCurrentLimit(40);
         deployMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-        deployMotorConfig.inverted(false);
-        deployMotorConfig.encoder.positionConversionFactor(2 * Math.PI);
+        deployMotorConfig.inverted(true);
+        deployMotorConfig.encoder.positionConversionFactor((2 * Math.PI) / 45.0);
 
         deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         deployMotor.getEncoder().setPosition(0);
+
+        initializePreferences();
     }
 
     public void setIntakeRollerMotorVoltage(double voltage) {
@@ -71,6 +73,10 @@ public class Intake extends SubsystemBase {
 
     public void refreshPreferences() {
         deployPid.setP(Preferences.getDouble("Intake/kP", 0.0));
+    }
+
+    public void resetPID(){
+        deployPid.reset();
     }
 
     public void periodic(){
