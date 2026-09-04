@@ -63,7 +63,8 @@ public class Intake extends SubsystemBase {
      */
 
     public void setDeployMotor(double angle) {
-        deployMotor.setVoltage(deployPid.calculate(angle));
+        double currentAngle = deployMotor.getEncoder().getPosition();
+        deployMotor.setVoltage(deployPid.calculate(currentAngle, angle));
     }
 
     private void initializePreferences() {
