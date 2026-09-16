@@ -6,6 +6,7 @@ import frc.robot.subsystems.Hopper;
 public class HopperTestCommand extends Command {
     private final Hopper hopper;
     private final double voltage;
+
     public HopperTestCommand(Hopper hopper, double voltage){
         this.hopper = hopper;
         this.voltage = voltage;

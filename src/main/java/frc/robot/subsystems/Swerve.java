@@ -1,5 +1,10 @@
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.studica.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.Matrix;
@@ -12,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SPI;
@@ -20,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.SwerveConstants;
+import frc.robot.utils.AllianceFlipUtil;
 import frc.robot.utils.SwerveModuleConfig;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,6 +51,43 @@ public class Swerve extends SubsystemBase {
         // Connect to the simulated navX device in HAL
         gyroSim = new SimDeviceSim("navX-Sensor", gyro.getPort());
         gyroYawSim = gyroSim.getDouble("Yaw");
+
+        RobotConfig config;
+        try {
+            config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            e.printStackTrace();
+            config = new RobotConfig(
+                    75.0,
+                    6.0,
+                    new ModuleConfig(
+                            Units.inchesToMeters(SwerveConstants.WHEEL_DIAMETER_INCHES / 2.0),
+                            SwerveConstants.MAX_SPEED,
+                            1.2,
+                            DCMotor.getNEO(1),
+                            60.0,
+                            1
+                    ),
+                    SwerveConstants.FRONT_LEFT_MODULE_POSE,
+                    SwerveConstants.FRONT_RIGHT_MODULE_POSE,
+                    SwerveConstants.BACK_LEFT_MODULE_POSE,
+                    SwerveConstants.BACK_RIGHT_MODULE_POSE
+            );
+        }
+
+        AutoBuilder.configure(
+                this::getPose,
+                this::resetOdometry,
+                this::getRobotRelativeSpeeds,
+                this::driveRobotRelative,
+                new PPHolonomicDriveController(
+                        new PIDConstants(SwerveConstants.AUTO_ROTATION_P, 0.0, SwerveConstants.AUTO_ROTATION_D),
+                        new PIDConstants(SwerveConstants.AUTO_ROTATION_P, 0.0, SwerveConstants.AUTO_ROTATION_D)
+                ),
+                config,
+                AllianceFlipUtil::shouldFlip,
+                this
+        );
     }
 
     private final SwerveDrivePoseEstimator poseEstimator =
@@ -105,6 +149,26 @@ public class Swerve extends SubsystemBase {
         );
 
         return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, gyro.getRotation2d());
+    }
+
+    public ChassisSpeeds getRobotRelativeSpeeds() {
+        return SwerveConstants.swerveDriveKinematics.toChassisSpeeds(
+                frontLeft.getState(),
+                frontRight.getState(),
+                backLeft.getState(),
+                backRight.getState()
+        );
+    }
+
+    public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+        ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+        SwerveModuleState[] swerveModuleStates =
+                SwerveConstants.swerveDriveKinematics.toSwerveModuleStates(targetSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
+        frontLeft.setDesiredState(swerveModuleStates[0]);
+        frontRight.setDesiredState(swerveModuleStates[1]);
+        backLeft.setDesiredState(swerveModuleStates[2]);
+        backRight.setDesiredState(swerveModuleStates[3]);
     }
 
     public void zeroGyro() {
