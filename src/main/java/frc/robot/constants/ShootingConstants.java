@@ -5,8 +5,11 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class ShootingConstants {
 
-    public static final int LEFT_SHOOTER_MOTOR_ID = 23;
-    public static final int RIGHT_SHOOTER_MOTOR_ID = 22;
+    public static final int LEFT_SHOOTER_MOTOR_ID = 39;
+    public static final int LEFT_SHOOTER_MOTOR_ID_2 = 47;
+    public static final int RIGHT_SHOOTER_MOTOR_ID = 54;
+    public static final int LEFT_KICKER_MOTOR_ID = 19;
+    public static final int RIGHT_KICKER_MOTOR_ID = 18;
 
     public static final int HOOD_MOTOR_ID = 0;
 

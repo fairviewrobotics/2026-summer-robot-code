@@ -25,6 +25,7 @@ public class RobotContainer
     final CommandXboxController secondary_controller = new CommandXboxController(1);
     private final Swerve swerve = new Swerve();
     private final Shooter shooter = new Shooter();
+    private final Kicker kicker = new Kicker();
     private final Hood hood = new Hood();
     private final Intake intake = new Intake();
     private final Hopper hopper = new Hopper();
@@ -64,7 +65,10 @@ public class RobotContainer
         secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve, intake));
         secondary_controller.a().whileTrue(new IntakeDeployPreferences(intake));
         secondary_controller.b().whileTrue(new IntakeDeployVoltageCommand(intake,2));
+        secondary_controller.leftBumper().whileTrue(new IntakeRollerVoltageCommand(intake, 2.0));
+        secondary_controller.rightBumper().whileTrue(new ShooterVoltageCommand(shooter, -2.0));
         secondary_controller.x().whileTrue(new HopperTestCommand(hopper,2));
+        secondary_controller.y().whileTrue(new KickerCommand(kicker, 2.0));
 
     }
 

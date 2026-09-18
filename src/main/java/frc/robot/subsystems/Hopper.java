@@ -1,10 +1,13 @@
 package frc.robot.subsystems;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.HopperConstants;
+import frc.robot.constants.ShootingConstants;
 
 public class Hopper extends SubsystemBase {
 

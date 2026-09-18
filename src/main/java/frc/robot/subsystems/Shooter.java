@@ -6,7 +6,16 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.Preferences;
@@ -17,10 +26,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
-    private final TalonFX leftShooterMotor = new TalonFX(ShootingConstants.LEFT_SHOOTER_MOTOR_ID);
-    private final TalonFX leftShooterMotor2 = new TalonFX(ShootingConstants.LEFT_SHOOTER_MOTOR_ID);
-    private final TalonFX rightShooterMotor = new TalonFX(ShootingConstants.RIGHT_SHOOTER_MOTOR_ID);
-    private final TalonFX rightShooterMotor2 = new TalonFX(ShootingConstants.RIGHT_SHOOTER_MOTOR_ID);
+    private final SparkFlex leftShooterMotor = new SparkFlex(ShootingConstants.LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    private final SparkFlex leftShooterMotor2 = new SparkFlex(ShootingConstants.LEFT_SHOOTER_MOTOR_ID_2, MotorType.kBrushless);
+    // private final SparkFlex rightShooterMotor = new SparkFlex(ShootingConstants.RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+
+    private PIDController ShooterPID = new PIDController(ShootingConstants.DEFAULT_KP, 0, ShootingConstants.DEFAULT_KD);
+    private SimpleMotorFeedforward ShooterFF = new SimpleMotorFeedforward(ShootingConstants.DEFAULT_KS, ShootingConstants.DEFAULT_KV);
 
     private double lastKP = ShootingConstants.DEFAULT_KP;
     private double lastKI = ShootingConstants.DEFAULT_KI;
@@ -57,49 +68,21 @@ public class Shooter extends SubsystemBase {
         Preferences.removeAll();
 
         initializePreferences();
-        TalonFXConfiguration leftShooterMotorConfig = new TalonFXConfiguration();
-        leftShooterMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        leftShooterMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        SparkFlexConfig leftShooterMotorConfig = new SparkFlexConfig();
+        leftShooterMotorConfig.inverted(true);
+        leftShooterMotorConfig.idleMode(IdleMode.kCoast);
 
-        leftShooterMotorConfig.Slot0.kP = Preferences.getDouble("Shooter/kP", ShootingConstants.DEFAULT_KP);
-        leftShooterMotorConfig.Slot0.kI = Preferences.getDouble("Shooter/kI", ShootingConstants.DEFAULT_KI);
-        leftShooterMotorConfig.Slot0.kD = Preferences.getDouble("Shooter/kD", ShootingConstants.DEFAULT_KD);
-        leftShooterMotorConfig.Slot0.kV = Preferences.getDouble("Shooter/kV", ShootingConstants.DEFAULT_KV);
-        leftShooterMotorConfig.Slot0.kS = Preferences.getDouble("Shooter/kS", ShootingConstants.DEFAULT_KS);
 
-        leftShooterMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
-        leftShooterMotorConfig.CurrentLimits.SupplyCurrentLimit = 60.0;
-        leftShooterMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;
+        leftShooterMotorConfig.smartCurrentLimit(40);
 
-        leftShooterMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        leftShooterMotorConfig.CurrentLimits.StatorCurrentLimit = 80.0;
+        SparkFlexConfig rightShooterMotorConfig = new SparkFlexConfig();
+        rightShooterMotorConfig.inverted(false);
 
-        leftShooterMotorConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
-        leftShooterMotorConfig.MotorOutput.PeakReverseDutyCycle = 0.0;
+        rightShooterMotorConfig.smartCurrentLimit(40);
 
-        TalonFXConfiguration rightShooterMotorConfig = new TalonFXConfiguration();
-        rightShooterMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        rightShooterMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-        rightShooterMotorConfig.Slot0.kP = Preferences.getDouble("Shooter/kP", ShootingConstants.DEFAULT_KP);
-        rightShooterMotorConfig.Slot0.kD = Preferences.getDouble("Shooter/kD", ShootingConstants.DEFAULT_KD);
-        rightShooterMotorConfig.Slot0.kV = Preferences.getDouble("Shooter/kV", ShootingConstants.DEFAULT_KV);
-        rightShooterMotorConfig.Slot0.kS = Preferences.getDouble("Shooter/kS", ShootingConstants.DEFAULT_KS);
-
-        rightShooterMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
-        rightShooterMotorConfig.CurrentLimits.SupplyCurrentLimit = 60.0;
-        rightShooterMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;
-
-        rightShooterMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        rightShooterMotorConfig.CurrentLimits.StatorCurrentLimit = 80.0;
-
-        rightShooterMotorConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
-        rightShooterMotorConfig.MotorOutput.PeakReverseDutyCycle = 0.0;
-
-        leftShooterMotor.getConfigurator().apply(leftShooterMotorConfig);
-        leftShooterMotor.getConfigurator().apply(rightShooterMotorConfig);
-        rightShooterMotor.getConfigurator().apply(rightShooterMotorConfig);
-        rightShooterMotor2.getConfigurator().apply(rightShooterMotorConfig);
+        leftShooterMotor.configure(leftShooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftShooterMotor2.configure(leftShooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // rightShooterMotor.configure(rightShooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         createDistanceToRPMMap();
         createDistanceToShotTimeMap();
@@ -121,34 +104,25 @@ public class Shooter extends SubsystemBase {
 
 
     private void updateHardwareConfigs() {
-        var slot0Config = new TalonFXConfiguration().Slot0;
-        slot0Config.kP = Preferences.getDouble("Shooter/kP", ShootingConstants.DEFAULT_KP);
-        slot0Config.kI = Preferences.getDouble("Shooter/kI", ShootingConstants.DEFAULT_KI);
-        slot0Config.kD = Preferences.getDouble("Shooter/kD", ShootingConstants.DEFAULT_KD);
-        slot0Config.kV = Preferences.getDouble("Shooter/kV", ShootingConstants.DEFAULT_KV);
-        slot0Config.kS = Preferences.getDouble("Shooter/kS", ShootingConstants.DEFAULT_KS);
-
-        leftShooterMotor.getConfigurator().apply(slot0Config);
-        leftShooterMotor2.getConfigurator().apply(slot0Config);
-        rightShooterMotor.getConfigurator().apply(slot0Config);
-        rightShooterMotor2.getConfigurator().apply(slot0Config);
-
+        ShooterPID.setP(Preferences.getDouble("Shooter/kP", ShootingConstants.DEFAULT_KP));
+        ShooterPID.setI(Preferences.getDouble("Shooter/kI", ShootingConstants.DEFAULT_KI));
+        ShooterPID.setD(Preferences.getDouble("Shooter/kD", ShootingConstants.DEFAULT_KD));
+        ShooterFF.setKv(Preferences.getDouble("Shooter/kV", ShootingConstants.DEFAULT_KV));
+        ShooterFF.setKs(Preferences.getDouble("Shooter/kS", ShootingConstants.DEFAULT_KS));
     }
 
     public void setMotorRPM(double rpm) {
         double rps = rpm / 60.0;
-        leftShooterMotor.setControl(new VelocityVoltage(rps));
-        leftShooterMotor2.setControl(new VelocityVoltage(rps));
-        rightShooterMotor.setControl(new VelocityVoltage(rps));
-        rightShooterMotor2.setControl(new VelocityVoltage(rps));
+        leftShooterMotor.setVoltage(ShooterPID.calculate(leftShooterMotor.getEncoder().getPosition(), rpm));
+        leftShooterMotor2.setVoltage(ShooterPID.calculate(leftShooterMotor2.getEncoder().getPosition(), rpm));
+        // rightShooterMotor.setVoltage(ShooterPID.calculate(rightShooterMotor.getEncoder().getPosition(), rpm));
     }
 
     public void setMotorRPMBangBang(double rpm) {
-        double bangOutput = shooterBangController.calculate(leftShooterMotor.getVelocity().getValueAsDouble() * 60, rpm);
+        double bangOutput = shooterBangController.calculate(leftShooterMotor.getEncoder().getVelocity(), rpm);
         leftShooterMotor.setVoltage(bangOutput * 12.0);
         leftShooterMotor2.setVoltage(bangOutput * 12.0);
-        rightShooterMotor.setVoltage(bangOutput * 12.0);
-        rightShooterMotor2.setVoltage(bangOutput * 12.0);
+        // rightShooterMotor.setVoltage(bangOutput * 12.0);
     }
 
     public boolean shooterAtSetpoint() {
@@ -159,33 +133,32 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
 
         filteredError = errorFilter.calculate(
-                Math.abs(leftShooterMotor.getClosedLoopError().getValueAsDouble())
+                Math.abs(ShooterPID.getError())
         );
 
-        Logger.recordOutput("Shooter/LEFT_MOTOR_RPM", leftShooterMotor.getVelocity().getValueAsDouble() * 60);
-        Logger.recordOutput("Shooter/RIGHT_MOTOR_RPM", rightShooterMotor.getVelocity().getValueAsDouble() * 60);
+        Logger.recordOutput("Shooter/LEFT_MOTOR_RPM", leftShooterMotor.getEncoder().getVelocity());
+        // Logger.recordOutput("Shooter/RIGHT_MOTOR_RPM", rightShooterMotor.getEncoder().getVelocity());
     }
 
     public void stopMotors() {
         leftShooterMotor.stopMotor();
         leftShooterMotor2.stopMotor();
-        rightShooterMotor.stopMotor();
-        rightShooterMotor2.stopMotor();
+        // rightShooterMotor.stopMotor();
     }
 
     public void setLeftShooterMotor(double rpm) {
-        leftShooterMotor.setControl(new VelocityVoltage(rpm/60));
+        leftShooterMotor.setVoltage(ShooterPID.calculate(leftShooterMotor.getEncoder().getPosition(), rpm));
     }
 
     public void setRightShooterMotor(double rpm) {
-        rightShooterMotor.setControl(new VelocityVoltage(rpm/60));
+        // rightShooterMotor.setVoltage(ShooterPID.calculate(rightShooterMotor.getEncoder().getPosition(), rpm));
     }
 
     public void setLeftShooterMotorVoltage(double voltage) {
         leftShooterMotor.setVoltage(voltage);
     }
 
-    public void setRightShooterMotorVoltage(double voltage) { rightShooterMotor.setVoltage(voltage); }
+    // public void setRightShooterMotorVoltage(double voltage) { rightShooterMotor.setVoltage(voltage); }
 
     public void setBothMotorsPreferences() {
         setLeftShooterMotor(Preferences.getDouble("Shooter/RPM_SETPOINT", ShootingConstants.SHOOTER_RPM));
