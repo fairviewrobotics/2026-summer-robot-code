@@ -16,12 +16,12 @@ public class ShooterVoltageCommand extends Command {
     @Override
     public void execute() {
         shooterSubsystem.setLeftShooterMotorVoltage(voltage);
-        // shooterSubsystem.setRightShooterMotorVoltage(voltage);
+         shooterSubsystem.setRightShooterMotorVoltage(voltage);
     }
 
     @Override
     public void end(boolean interrupted) {
         shooterSubsystem.setLeftShooterMotorVoltage(0);
-        // shooterSubsystem.setRightShooterMotorVoltage(0);
+        shooterSubsystem.setRightShooterMotorVoltage(0);
     }
 }

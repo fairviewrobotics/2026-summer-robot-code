@@ -6,6 +6,13 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
@@ -15,31 +22,28 @@ import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
 
-    public TalonFX hoodMotor = new TalonFX(ShootingConstants.HOOD_MOTOR_ID);
-    public TalonFXConfiguration hoodMotorConfig = new TalonFXConfiguration();
+    public SparkFlex hoodMotor = new SparkFlex(ShootingConstants.HOOD_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+    public SparkFlexConfig hoodMotorConfig = new SparkFlexConfig();
 
     private final InterpolatingDoubleTreeMap DistanceToAngle =
             new InterpolatingDoubleTreeMap();
+
+    private PIDController hoodPID = new PIDController(0.0, 0.0, 0.0);
 
     public Hood() {
         initializePreferences();
         resetHoodPosition();
 
-        hoodMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        hoodMotorConfig.CurrentLimits.StatorCurrentLimit = 20.0;
-        hoodMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        hoodMotorConfig.CurrentLimits.SupplyCurrentLimit = 15.0;
-        hoodMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 25.0;
-        hoodMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;
+        hoodMotorConfig.smartCurrentLimit(20);
 
-        hoodMotorConfig.Feedback.SensorToMechanismRatio = ShootingConstants.HOOD_CONVERSION_FACTOR;
+        hoodMotorConfig.encoder.positionConversionFactor(ShootingConstants.HOOD_CONVERSION_FACTOR);
 
-        hoodMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        hoodMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        hoodMotorConfig.inverted(false);
+        hoodMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
 
-        hoodMotorConfig.Slot0.kP = Preferences.getDouble("Hood/kP", 0.0);
-        hoodMotorConfig.Slot0.kD = Preferences.getDouble("Hood/kD", 0.0);
+        hoodMotor.configure(hoodMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         createDistanceToAngleMap();
+        hoodPID.setTolerance(0.01);
     }
 
     private void initializePreferences() {
@@ -48,11 +52,9 @@ public class Hood extends SubsystemBase {
         Preferences.initDouble("Hood/TARGET_ANGLE", 0.0);
     }
 
-    private void updatePreferences() {
-        Slot0Configs hoodMotorConfig = new Slot0Configs();
-        hoodMotorConfig.kP = Preferences.getDouble("Hood/kP", 0.0);
-        hoodMotorConfig.kD = Preferences.getDouble("Hood/kD", 0.0);
-        hoodMotor.getConfigurator().apply(hoodMotorConfig);
+    public void updatePreferences() {
+        hoodPID.setP(Preferences.getDouble("Hood/kP", 0.0));
+        hoodPID.setD(Preferences.getDouble("Hood/kD", 0.0));
     }
 
 
@@ -62,7 +64,7 @@ public class Hood extends SubsystemBase {
      */
 
     public void setHoodPosition(double position) {
-        hoodMotor.setControl(new PositionVoltage(position));
+        hoodMotor.setVoltage(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), position));
     }
 
     public void setHoodVoltage(double voltage) {
@@ -70,7 +72,7 @@ public class Hood extends SubsystemBase {
     }
 
     public void periodic() {
-        Logger.recordOutput("Hood/HOOD_POSITION", hoodMotor.getPosition().getValueAsDouble());
+        Logger.recordOutput("Hood/HOOD_POSITION", hoodMotor.getEncoder().getPosition());
     }
 
     public void stopHood() {
@@ -80,7 +82,7 @@ public class Hood extends SubsystemBase {
     public void setVoltage(double voltage) {hoodMotor.setVoltage(voltage);}
 
     public void resetHoodPosition() {
-        hoodMotor.setPosition(0);
+        hoodMotor.getEncoder().setPosition(0);
     }
 
     private void createDistanceToAngleMap() {

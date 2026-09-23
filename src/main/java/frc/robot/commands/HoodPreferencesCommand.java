@@ -9,7 +9,6 @@ public class HoodPreferencesCommand extends Command {
 
     public HoodPreferencesCommand(Hood hood) {
         this.hood = hood;
-
         addRequirements(hood);
     }
 

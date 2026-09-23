@@ -13,13 +13,13 @@ public class Kicker {
     TalonFXConfiguration kickerMotor2Config = new TalonFXConfiguration();
 
     public Kicker() {
-        kickerMotor1Config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        kickerMotor2Config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        kickerMotor1Config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        kickerMotor2Config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     }
 
 
     public void RunWithVoltage(double voltage){
-        kickerMotor1.setVoltage(voltage);
+        kickerMotor1.setVoltage(-voltage);
         kickerMotor2.setVoltage(voltage);
     }
 

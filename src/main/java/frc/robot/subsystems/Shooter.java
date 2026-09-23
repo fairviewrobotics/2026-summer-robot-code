@@ -6,9 +6,10 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.ResetMode.*;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -28,22 +29,11 @@ public class Shooter extends SubsystemBase {
 
     private final SparkFlex leftShooterMotor = new SparkFlex(ShootingConstants.LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
     private final SparkFlex leftShooterMotor2 = new SparkFlex(ShootingConstants.LEFT_SHOOTER_MOTOR_ID_2, MotorType.kBrushless);
-    // private final SparkFlex rightShooterMotor = new SparkFlex(ShootingConstants.RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    private final SparkFlex rightShooterMotor = new SparkFlex(ShootingConstants.RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
 
     private PIDController ShooterPID = new PIDController(ShootingConstants.DEFAULT_KP, 0, ShootingConstants.DEFAULT_KD);
     private SimpleMotorFeedforward ShooterFF = new SimpleMotorFeedforward(ShootingConstants.DEFAULT_KS, ShootingConstants.DEFAULT_KV);
 
-    private double lastKP = ShootingConstants.DEFAULT_KP;
-    private double lastKI = ShootingConstants.DEFAULT_KI;
-    private double lastKD = ShootingConstants.DEFAULT_KD;
-    private double lastKV = ShootingConstants.DEFAULT_KV;
-    private double lastKS = ShootingConstants.DEFAULT_KS;
-    private double lastRPM = ShootingConstants.SHOOTER_RPM;
-    private double lastMap1 = 2000.0;
-    private double lastMap2 = 2350.0;
-    private double lastMap3 = 3000.0;
-    private double lastMap4 = 3450.0;
-    private double lastMap5 = 4500.0;
 
     private final InterpolatingDoubleTreeMap DistanceToRPMLeft =
             new InterpolatingDoubleTreeMap();
@@ -65,7 +55,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
 
         // Get rid of this at some point, Daniel
-        Preferences.removeAll();
+//        Preferences.removeAll();
 
         initializePreferences();
         SparkFlexConfig leftShooterMotorConfig = new SparkFlexConfig();
@@ -77,12 +67,13 @@ public class Shooter extends SubsystemBase {
 
         SparkFlexConfig rightShooterMotorConfig = new SparkFlexConfig();
         rightShooterMotorConfig.inverted(false);
+        rightShooterMotorConfig.idleMode(IdleMode.kCoast);
 
         rightShooterMotorConfig.smartCurrentLimit(40);
 
         leftShooterMotor.configure(leftShooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         leftShooterMotor2.configure(leftShooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        // rightShooterMotor.configure(rightShooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightShooterMotor.configure(rightShooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         createDistanceToRPMMap();
         createDistanceToShotTimeMap();
@@ -103,7 +94,7 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    private void updateHardwareConfigs() {
+    public void updateHardwareConfigs() {
         ShooterPID.setP(Preferences.getDouble("Shooter/kP", ShootingConstants.DEFAULT_KP));
         ShooterPID.setI(Preferences.getDouble("Shooter/kI", ShootingConstants.DEFAULT_KI));
         ShooterPID.setD(Preferences.getDouble("Shooter/kD", ShootingConstants.DEFAULT_KD));
@@ -113,16 +104,18 @@ public class Shooter extends SubsystemBase {
 
     public void setMotorRPM(double rpm) {
         double rps = rpm / 60.0;
-        leftShooterMotor.setVoltage(ShooterPID.calculate(leftShooterMotor.getEncoder().getPosition(), rpm));
-        leftShooterMotor2.setVoltage(ShooterPID.calculate(leftShooterMotor2.getEncoder().getPosition(), rpm));
-        // rightShooterMotor.setVoltage(ShooterPID.calculate(rightShooterMotor.getEncoder().getPosition(), rpm));
+        double PIDCalc = ShooterPID.calculate(leftShooterMotor.getEncoder().getVelocity(), rpm);
+        double FFcalc = ShooterFF.calculate(rpm);
+        leftShooterMotor.setVoltage(PIDCalc + FFcalc);
+        leftShooterMotor2.setVoltage(PIDCalc + FFcalc);
+         rightShooterMotor.setVoltage(PIDCalc + FFcalc);
     }
 
     public void setMotorRPMBangBang(double rpm) {
         double bangOutput = shooterBangController.calculate(leftShooterMotor.getEncoder().getVelocity(), rpm);
         leftShooterMotor.setVoltage(bangOutput * 12.0);
         leftShooterMotor2.setVoltage(bangOutput * 12.0);
-        // rightShooterMotor.setVoltage(bangOutput * 12.0);
+         rightShooterMotor.setVoltage(bangOutput * 12.0);
     }
 
     public boolean shooterAtSetpoint() {
@@ -135,15 +128,16 @@ public class Shooter extends SubsystemBase {
         filteredError = errorFilter.calculate(
                 Math.abs(ShooterPID.getError())
         );
+        Logger.recordOutput("Shooter/FFOutput", ShooterFF.calculate(Preferences.getDouble("Shooter/RPM_SETPOINT", 0.0)));
 
         Logger.recordOutput("Shooter/LEFT_MOTOR_RPM", leftShooterMotor.getEncoder().getVelocity());
-        // Logger.recordOutput("Shooter/RIGHT_MOTOR_RPM", rightShooterMotor.getEncoder().getVelocity());
+        Logger.recordOutput("Shooter/RIGHT_MOTOR_RPM", rightShooterMotor.getEncoder().getVelocity());
     }
 
     public void stopMotors() {
-        leftShooterMotor.stopMotor();
-        leftShooterMotor2.stopMotor();
-        // rightShooterMotor.stopMotor();
+        leftShooterMotor.setVoltage(0.0);
+        leftShooterMotor2.setVoltage(0.0);
+         rightShooterMotor.setVoltage(0.0);
     }
 
     public void setLeftShooterMotor(double rpm) {
@@ -151,14 +145,14 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setRightShooterMotor(double rpm) {
-        // rightShooterMotor.setVoltage(ShooterPID.calculate(rightShooterMotor.getEncoder().getPosition(), rpm));
+         rightShooterMotor.setVoltage(ShooterPID.calculate(rightShooterMotor.getEncoder().getPosition(), rpm));
     }
 
     public void setLeftShooterMotorVoltage(double voltage) {
         leftShooterMotor.setVoltage(voltage);
     }
 
-    // public void setRightShooterMotorVoltage(double voltage) { rightShooterMotor.setVoltage(voltage); }
+     public void setRightShooterMotorVoltage(double voltage) { rightShooterMotor.setVoltage(voltage); }
 
     public void setBothMotorsPreferences() {
         setLeftShooterMotor(Preferences.getDouble("Shooter/RPM_SETPOINT", ShootingConstants.SHOOTER_RPM));

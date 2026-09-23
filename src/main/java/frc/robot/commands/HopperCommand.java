@@ -7,6 +7,7 @@ public class HopperCommand extends Command {
 
     private final Hopper hopper;
     private final double voltage;
+
     public HopperCommand(Hopper hopper, double voltage){
         this.hopper = hopper;
         this.voltage = voltage;
@@ -14,7 +15,7 @@ public class HopperCommand extends Command {
 
     @Override
     public void execute() {
-        hopper.setHopperRightMotorVoltage(voltage);
+        hopper.setHopperRightMotorVoltage(-voltage);
         hopper.setLeftHopperMotorVoltage(voltage);
     }
 

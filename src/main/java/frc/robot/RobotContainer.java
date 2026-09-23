@@ -62,13 +62,14 @@ public class RobotContainer
         );
         primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
 
-        secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve, intake));
+        secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve, intake, shooter, hood));
         secondary_controller.a().whileTrue(new IntakeDeployPreferences(intake));
-        secondary_controller.b().whileTrue(new IntakeDeployVoltageCommand(intake,2));
-        secondary_controller.leftBumper().whileTrue(new IntakeRollerVoltageCommand(intake, 2.0));
-        secondary_controller.rightBumper().whileTrue(new ShooterVoltageCommand(shooter, -2.0));
-        secondary_controller.x().whileTrue(new HopperTestCommand(hopper,2));
-        secondary_controller.y().whileTrue(new KickerCommand(kicker, 2.0));
+        secondary_controller.b().whileTrue(new IntakeDeployVoltageCommand(intake,8.0));
+        secondary_controller.leftBumper().whileTrue(new IntakeRollerVoltageCommand(intake, -8.0));
+        secondary_controller.rightBumper().whileTrue(new ShooterPreferencesCommand(shooter, 0.0));
+        secondary_controller.x().whileTrue(new HopperCommand(hopper,6.0));
+        secondary_controller.y().whileTrue(new KickerCommand(kicker, -12.0));
+        secondary_controller.rightTrigger().whileTrue(new HoodPreferencesCommand(hood));
 
     }
 

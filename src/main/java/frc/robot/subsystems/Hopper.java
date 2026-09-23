@@ -20,7 +20,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public void setLeftHopperMotorVoltage(double voltage){
-        leftHopperMotor.setVoltage(voltage);
+        leftHopperMotor.setVoltage(-voltage);
     }
 
     public void setHopperRightMotorVoltage(double voltage){
