@@ -15,13 +15,13 @@ public class VisionConstants {
     public static final double TAG_AMBIGUITY_TOLERANCE = 0.15;
 
     // Inches
-    public static final double BACK_CAM_POSE_X = -11.5;
-    public static final double BACK_CAM_POSE_Y = -9.0;
-    public static final double BACK_CAM_POSE_Z = 17.0;
+    public static final double BACK_CAM_POSE_X = -12.75;
+    public static final double BACK_CAM_POSE_Y = 0.0;
+    public static final double BACK_CAM_POSE_Z = 16.5;
 
     // Degrees
     public static final double BACK_CAM_POSE_ROLL = 0.0;
-    public static final double BACK_CAM_POSE_PITCH = -30;
+    public static final double BACK_CAM_POSE_PITCH = -23.0;
     public static final double BACK_CAM_POSE_YAW = 180.0;
 
 

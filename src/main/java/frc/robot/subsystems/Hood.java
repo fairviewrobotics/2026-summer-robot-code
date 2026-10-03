@@ -50,11 +50,24 @@ public class Hood extends SubsystemBase {
         Preferences.initDouble("Hood/kP", 0.0);
         Preferences.initDouble("Hood/kD", 0.0);
         Preferences.initDouble("Hood/TARGET_ANGLE", 0.0);
+
+        Preferences.initDouble("Hood_Map/DIST_MAP_ONE", 0.0);
+        Preferences.initDouble("Hood_Map/DIST_MAP_TWO", 3.0796);
+        Preferences.initDouble("Hood_Map/DIST_MAP_THREE", 4.1596);
+        Preferences.initDouble("Hood_Map/DIST_MAP_FOUR", 5.1396);
+        Preferences.initDouble("Hood_Map/DIST_MAP_FIVE", 6.0);
+
+        Preferences.initDouble("Hood_Map/ANGLE_MAP_ONE", 10.0);
+        Preferences.initDouble("Hood_Map/ANGLE_MAP_TWO", 20.0);
+        Preferences.initDouble("Hood_Map/ANGLE_MAP_THREE", 0.0);
+        Preferences.initDouble("Hood_Map/ANGLE_MAP_FOUR", 0.0);
+        Preferences.initDouble("Hood_Map/ANGLE_MAP_FIVE", 80.0);
     }
 
     public void updatePreferences() {
         hoodPID.setP(Preferences.getDouble("Hood/kP", 0.0));
         hoodPID.setD(Preferences.getDouble("Hood/kD", 0.0));
+        createDistanceToAngleMap();
     }
 
 
@@ -85,12 +98,29 @@ public class Hood extends SubsystemBase {
         hoodMotor.getEncoder().setPosition(0);
     }
 
+    // Distance (m), Hood Angle (rad)
     private void createDistanceToAngleMap() {
-        DistanceToAngle.put(0.0, Math.toRadians(10));
-        DistanceToAngle.put(3.0796, Math.toRadians(20));
-        DistanceToAngle.put(4.1596, Math.toRadians(40));
-        DistanceToAngle.put(5.1396, Math.toRadians(60));
-        DistanceToAngle.put(6.0, Math.toRadians(80));
+        DistanceToAngle.clear();
+        DistanceToAngle.put(
+                Preferences.getDouble("Hood_Map/DIST_MAP_ONE", 0.0),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_ONE", 10.0)
+        );
+        DistanceToAngle.put(
+                Preferences.getDouble("Hood_Map/DIST_MAP_TWO", 3.0796),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_TWO", 20.0)
+        );
+        DistanceToAngle.put(
+                Preferences.getDouble("Hood_Map/DIST_MAP_THREE", 4.1596),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_THREE", 0.0)
+        );
+        DistanceToAngle.put(
+                Preferences.getDouble("Hood_Map/DIST_MAP_FOUR", 5.1396),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_FOUR", 0.0)
+        );
+        DistanceToAngle.put(
+                Preferences.getDouble("Hood_Map/DIST_MAP_FIVE", 6.0),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_FIVE", 80.0)
+        );
     }
 
     public double getDistanceToAngle(double distance){

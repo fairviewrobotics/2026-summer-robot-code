@@ -25,7 +25,7 @@ public class RefreshPreferences extends InstantCommand {
     public void initialize() {
         swerve.updatePreferences();
         intake.refreshPreferences();
-        shooter.updateHardwareConfigs();
+        shooter.refreshPreferences();
         hood.updatePreferences();
     }
 

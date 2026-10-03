@@ -17,8 +17,14 @@ public class IntakeDeployPreferences extends Command {
         intake.resetPID();
     }
     @Override
-    public void execute() { intake.setDeployMotor(Preferences.getDouble("Deploy/TARGET_ANGLE", 0.0)); }
+    public void execute() {
+        intake.setDeployMotor(Preferences.getDouble("Deploy/TARGET_ANGLE", 0.0));
+        intake.setIntakeRollerMotorVoltage(-8);
+    }
 
     @Override
-    public void end(boolean interrupted) { intake.setDeployMotor(0.0); }
+    public void end(boolean interrupted) {
+        intake.setDeployMotor(0.0);
+        intake.setIntakeRollerMotorVoltage(0);
+    }
 }

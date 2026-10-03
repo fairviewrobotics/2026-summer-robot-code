@@ -30,7 +30,7 @@ public class RobotContainer
     private final Intake intake = new Intake();
     private final Hopper hopper = new Hopper();
     private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve, hood, shooter, intake, hopper);
-//    private final Vision vision = new Vision(swerve);
+    private final Vision vision = new Vision(swerve);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -63,11 +63,10 @@ public class RobotContainer
         primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
 
         secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve, intake, shooter, hood));
-        secondary_controller.a().whileTrue(new IntakeDeployPreferences(intake));
         secondary_controller.b().whileTrue(new IntakeDeployVoltageCommand(intake,8.0));
-        secondary_controller.leftBumper().whileTrue(new IntakeRollerVoltageCommand(intake, -8.0));
-        secondary_controller.rightBumper().whileTrue(new ShooterPreferencesCommand(shooter, 0.0));
-        secondary_controller.x().whileTrue(new HopperCommand(hopper,6.0));
+        secondary_controller.leftBumper().whileTrue(new IntakeDeployPreferences(intake));
+        secondary_controller.rightBumper().whileTrue(new ShooterPreferencesCommand(shooter));
+        secondary_controller.x().whileTrue(new HopperCommand(hopper,-6.0));
         secondary_controller.y().whileTrue(new KickerCommand(kicker, -12.0));
         secondary_controller.rightTrigger().whileTrue(new HoodPreferencesCommand(hood));
 

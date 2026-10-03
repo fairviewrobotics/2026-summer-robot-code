@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
     SparkFlex leftRollerMotor = new SparkFlex(IntakeConstants.INTAKE_LEFT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
     SparkFlex rightRollerMotor = new SparkFlex(IntakeConstants.INTAKE_RIGHT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
     SparkFlex deployMotor = new SparkFlex(IntakeConstants.INTAKE_DEPLOY_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-    PIDController deployPid = new PIDController(0.01, 0.0, 0.0);
+    PIDController deployPid = new PIDController(5.0, 0.0, 0.0);
 
     public Intake() {
         SparkFlexConfig rollerMotorConfig = new SparkFlexConfig();
@@ -40,7 +40,6 @@ public class Intake extends SubsystemBase {
         deployMotorConfig.smartCurrentLimit(40);
         deployMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         deployMotorConfig.inverted(true);
-        deployMotorConfig.encoder.positionConversionFactor((2 * Math.PI) / 45.0);
 
         deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         deployMotor.getEncoder().setPosition(0);
@@ -57,6 +56,10 @@ public class Intake extends SubsystemBase {
         deployMotor.setVoltage(voltage);
     }
 
+    public void resetIntakeEncoder() {
+        deployMotor.getEncoder().setPosition(0);
+    }
+
     /**
      *
      * @param angle target angle in radians. 0 is hard stop, + is CCW
@@ -65,6 +68,10 @@ public class Intake extends SubsystemBase {
     public void setDeployMotor(double angle) {
         double currentAngle = deployMotor.getEncoder().getPosition();
         deployMotor.setVoltage(deployPid.calculate(currentAngle, angle));
+
+        if (angle <= 0.0 || Math.abs(currentAngle) < 0.5) {
+            resetIntakeEncoder();
+        }
     }
 
     private void initializePreferences() {

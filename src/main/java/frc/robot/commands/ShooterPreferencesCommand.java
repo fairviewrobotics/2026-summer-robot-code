@@ -8,7 +8,7 @@ import frc.robot.subsystems.Shooter;
 public class ShooterPreferencesCommand extends Command {
     private final Shooter shooterSubsystem;
 
-    public ShooterPreferencesCommand(Shooter shooterSubsystem, double RPM) {
+    public ShooterPreferencesCommand(Shooter shooterSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
         addRequirements(shooterSubsystem);
     }
