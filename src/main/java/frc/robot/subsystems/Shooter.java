@@ -117,9 +117,10 @@ public class Shooter extends SubsystemBase {
     public void setMotorRPMBangBang(double rpm) {
         double currentRpm = leftShooterMotor.getEncoder().getVelocity();
         double rps = rpm / 60.0;
-        double ffVoltage = ShooterFF.calculate(rpm);
+        double ffVoltage = ShooterFF.calculate(rps);
 
-        double outputVoltage = shooterBangController.calculate(rpm);
+        double bang = shooterBangController.calculate(currentRpm, rpm);
+        double outputVoltage = (bang > 0) ? 12.0 : ffVoltage;
 
         leftShooterMotor.setVoltage(outputVoltage);
         leftShooterMotor2.setVoltage(outputVoltage);

@@ -18,7 +18,6 @@ public class RefreshPreferences extends InstantCommand {
         this.intake = intake;
         this.shooter = shooter;
         this.hood = hood;
-        // Do NOT add requirements so it won't interrupt active driving or intake commands
     }
 
     @Override
