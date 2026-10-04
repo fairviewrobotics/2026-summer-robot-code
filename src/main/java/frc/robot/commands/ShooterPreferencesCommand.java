@@ -17,7 +17,7 @@ public class ShooterPreferencesCommand extends Command {
     public void execute() {
         double RPM = Preferences.getDouble("Shooter/RPM_SETPOINT", ShootingConstants.SHOOTER_RPM);
         double shooterSetpoint = RPM * Preferences.getDouble("AimAtHub/SHOOTER_RPM_SCALAR", 1.0);
-        shooterSubsystem.setMotorRPMBangBang(shooterSetpoint);
+        shooterSubsystem.setMotorRPM(shooterSetpoint);
     }
 
     @Override
