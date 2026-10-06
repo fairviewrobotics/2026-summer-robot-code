@@ -21,7 +21,7 @@ public class BadDoubleSwiple extends SequentialCommandGroup {
 
             new ParallelDeadlineGroup(
                 new WaitCommand(4.0),
-                new AimAtTarget(shooter, hood, swerve, FieldConstants.BLUE_HUB_POSE3D::toPose2d, () -> 0.0, () -> 0.0),
+                new AimAtTarget(shooter, hood, swerve, hopper, FieldConstants.BLUE_HUB_POSE3D::toPose2d, () -> 0.0, () -> 0.0),
                 new HopperCommand(hopper, 4.0)
             ),
 
@@ -35,7 +35,7 @@ public class BadDoubleSwiple extends SequentialCommandGroup {
 
             new ParallelDeadlineGroup(
                 new WaitCommand(4.0),
-                new AimAtTarget(shooter, hood, swerve, FieldConstants.BLUE_HUB_POSE3D::toPose2d, () -> 0.0, () -> 0.0),
+                new AimAtTarget(shooter, hood, swerve, hopper, FieldConstants.BLUE_HUB_POSE3D::toPose2d, () -> 0.0, () -> 0.0),
                 new HopperCommand(hopper, 4.0)
             )
 

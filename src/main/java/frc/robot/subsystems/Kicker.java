@@ -51,6 +51,10 @@ public class Kicker extends SubsystemBase {
         kickerMotor2.setVoltage(voltage);
     }
 
+    public boolean isAtRPM(double targetRPM, double toleranceRPM) {
+        return Math.abs(kickerMotor1.getVelocity().getValueAsDouble() - targetRPM) <= toleranceRPM;
+    }
+
     public void setRPM(double RPM){
         double PIDCalc = KickerPID.calculate(kickerMotor1.getVelocity().getValueAsDouble() * 60, RPM);
         double FFcalc = KickerFF.calculate(RPM);

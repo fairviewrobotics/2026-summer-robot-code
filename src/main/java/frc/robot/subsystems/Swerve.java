@@ -11,6 +11,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -46,7 +48,6 @@ public class Swerve extends SubsystemBase {
 
     public Swerve() {
         initializePreferences();
-        gyro.setAngleAdjustment(270);
 
         // Connect to the simulated navX device in HAL
         gyroSim = new SimDeviceSim("navX-Sensor", gyro.getPort());
@@ -81,13 +82,14 @@ public class Swerve extends SubsystemBase {
                 this::getRobotRelativeSpeeds,
                 this::driveRobotRelative,
                 new PPHolonomicDriveController(
-                        new PIDConstants(SwerveConstants.AUTO_ROTATION_P, 0.0, SwerveConstants.AUTO_ROTATION_D),
-                        new PIDConstants(SwerveConstants.AUTO_ROTATION_P, 0.0, SwerveConstants.AUTO_ROTATION_D)
+                        new PIDConstants(5.0, 0.0, SwerveConstants.AUTO_ROTATION_D),
+                        new PIDConstants(1.5, 0.0, SwerveConstants.AUTO_ROTATION_D)
                 ),
                 config,
                 AllianceFlipUtil::shouldFlip,
                 this
         );
+//        gyro.setAngleAdjustment(180);
     }
 
     private final SwerveDrivePoseEstimator poseEstimator =
@@ -109,7 +111,7 @@ public class Swerve extends SubsystemBase {
                 SwerveConstants.swerveDriveKinematics.toSwerveModuleStates(
                         ChassisSpeeds.discretize(
                                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                                        xVel, yVel, omega, getPose().getRotation()),
+                                        xVel, yVel, omega, gyro.getRotation2d()),
                                 0.02
                         )
                 );
@@ -173,6 +175,17 @@ public class Swerve extends SubsystemBase {
 
     public void zeroGyro() {
         gyro.reset();
+        resetOdometry(Pose2d.kZero);
+        poseEstimator.resetPosition(
+                gyro.getRotation2d(),
+                new SwerveModulePosition[] {
+                        frontLeft.getPosition(),
+                        frontRight.getPosition(),
+                        backLeft.getPosition(),
+                        backRight.getPosition()
+                },
+                AllianceFlipUtil.apply(Pose2d.kZero)
+        );
     }
 
     public Pose2d getPose() {
@@ -197,6 +210,9 @@ public class Swerve extends SubsystemBase {
 
         Logger.recordOutput("Swerve/Pose", getPose());
         SmartDashboard.putData("Swerve/Field", field);
+        Logger.recordOutput("Swerve/Gyro", gyro.getRotation2d());
+        Logger.recordOutput("Swerve/Yaw", gyro.getYaw());
+        Logger.recordOutput("Swerve/Angle", gyro.getAngle());
         field.setRobotPose(poseEstimator.getEstimatedPosition());
         Logger.recordOutput("Swerve/ModuleStates",
                 frontLeft.getState(),

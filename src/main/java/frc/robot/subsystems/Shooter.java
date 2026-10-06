@@ -111,7 +111,7 @@ public class Shooter extends SubsystemBase {
         double FFcalc = ShooterFF.calculate(rpm);
         leftShooterMotor.setVoltage(PIDCalc + FFcalc);
         leftShooterMotor2.setVoltage(PIDCalc + FFcalc);
-         rightShooterMotor.setVoltage(PIDCalc + FFcalc);
+        rightShooterMotor.setVoltage(PIDCalc + FFcalc);
     }
 
     public void setMotorRPMBangBang(double rpm) {
@@ -129,6 +129,10 @@ public class Shooter extends SubsystemBase {
 
     public boolean shooterAtSetpoint() {
         return filteredError < (ShootingConstants.SHOOTER_TOLERANCE_RPM / 60);
+    }
+
+    public boolean isAtRPM(double targetRPM, double toleranceRPM) {
+        return Math.abs(leftShooterMotor.getEncoder().getVelocity() - targetRPM) <= toleranceRPM;
     }
 
     @Override
@@ -200,7 +204,7 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    public double getDistanceToRPMM(double distance) {return DistanceToRPM.get(distance);}
+    public double getDistanceToRPM(double distance) {return DistanceToRPM.get(distance);}
     public double getDistanceToShotTime(double distance) {return DistanceToShotTime.get(distance);}
 
 }

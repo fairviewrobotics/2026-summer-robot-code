@@ -5,6 +5,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
+import frc.robot.utils.AllianceFlipUtil;
 
 public class Drive extends Command {
     private final Swerve swerve;
@@ -26,20 +27,21 @@ public class Drive extends Command {
 
     @Override
     public void execute() {
-        double xSpeed = xVel.getAsDouble();
-        double ySpeed = yVel.getAsDouble();
-        double turningSpeed = omega.getAsDouble();
+        double xSpeed = Math.pow(MathUtil.applyDeadband(xVel.getAsDouble(), 0.1), 3);
+        double ySpeed = Math.pow(MathUtil.applyDeadband(yVel.getAsDouble(), 0.1), 3);
+        double turningSpeed = MathUtil.applyDeadband(omega.getAsDouble(), 0.1);
 
-        xSpeed = Math.pow(-MathUtil.applyDeadband(xSpeed, 0.1), 3);
-        ySpeed = Math.pow(MathUtil.applyDeadband(ySpeed, 0.1), 3);
-        turningSpeed = MathUtil.applyDeadband(turningSpeed, 0.1);
+        // Scaling
+        double xVelocity = xSpeed * SwerveConstants.MAX_SPEED * 0.6;
+        double yVelocity = ySpeed * SwerveConstants.MAX_SPEED * 0.6;
+        double turningVelocity = turningSpeed * (Math.PI * 2) * 0.5;
+//
+//        if (AllianceFlipUtil.shouldFlip()) {
+//            xVelocity = -xVelocity;
+//            yVelocity = -yVelocity;
+//        }
 
-        // MoSim scaling
-        double xVel = xSpeed * SwerveConstants.MAX_SPEED * ((double) 3 /5);
-        double yVel = ySpeed * SwerveConstants.MAX_SPEED * ((double) 3 /5);
-        double turningVel = turningSpeed * (Math.PI * 2) * 0.5;
-
-        swerve.drive(xVel, yVel, turningVel);
+        swerve.drive(xVelocity, yVelocity, turningVelocity);
     }
 
     @Override

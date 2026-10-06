@@ -47,10 +47,10 @@ public class SwerveConstants {
     public static final int BACK_RIGHT_ENCODER_ID = 14;
 
     // Inversions
-    public static final boolean FRONT_LEFT_DRIVE_INVERTED = false;
-    public static final boolean FRONT_RIGHT_DRIVE_INVERTED = false;
-    public static final boolean BACK_LEFT_DRIVE_INVERTED = false;
-    public static final boolean BACK_RIGHT_DRIVE_INVERTED = false;
+    public static final boolean FRONT_LEFT_DRIVE_INVERTED = true;
+    public static final boolean FRONT_RIGHT_DRIVE_INVERTED = true;
+    public static final boolean BACK_LEFT_DRIVE_INVERTED = true;
+    public static final boolean BACK_RIGHT_DRIVE_INVERTED = true;
 
     public static final boolean FRONT_LEFT_TURNING_INVERTED = true;
     public static final boolean FRONT_RIGHT_TURNING_INVERTED = true;

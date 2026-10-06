@@ -19,11 +19,12 @@ public class SuperSecretMissileTech {
             superSecretMissileTech = AutoBuilder.buildAutoChooser();
         } else {
             superSecretMissileTech = new SendableChooser<>();
+            superSecretMissileTech.setDefaultOption("NOTHING", new SequentialCommandGroup());
         }
-        superSecretMissileTech.setDefaultOption("NOTHING", new SequentialCommandGroup());
+        superSecretMissileTech.addOption("NOTHING", new SequentialCommandGroup());
         superSecretMissileTech.addOption("BOX TEST", new BoxTest(swerve));
         superSecretMissileTech.addOption("BAD DOUBLE SWIPE", new BadDoubleSwiple(swerve, hood, shooter, intake, hopper));
-        superSecretMissileTech.addOption("DOUBLE SWIPE", new DoubleSwipeOverTrench(swerve, shooter, hood, intake));
+        superSecretMissileTech.addOption("DOUBLE SWIPE", new DoubleSwipeOverTrench(swerve, shooter, hood, intake, hopper));
         SmartDashboard.putData("Autonomous Selector", superSecretMissileTech);
     }
 

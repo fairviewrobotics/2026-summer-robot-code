@@ -122,7 +122,7 @@ public class SwerveModule extends SubsystemBase {
             driveMotor.getVelocity().getValueAsDouble()
                     / SwerveConstants.DRIVE_GEAR_RATIO
                     * SwerveConstants.WHEEL_CIRCUMFERENCE_METERS,
-            Rotation2d.fromRotations(turningEncoder.getAbsolutePosition().getValueAsDouble()));
+            Rotation2d.fromRotations(turningMotor.getPosition().getValueAsDouble()));
   }
 
   public SwerveModulePosition getPosition() {
@@ -130,12 +130,12 @@ public class SwerveModule extends SubsystemBase {
             driveMotor.getPosition().getValueAsDouble()
                     / SwerveConstants.DRIVE_GEAR_RATIO
                     * SwerveConstants.WHEEL_CIRCUMFERENCE_METERS,
-            Rotation2d.fromRotations(turningEncoder.getAbsolutePosition().getValueAsDouble()));
+            Rotation2d.fromRotations(turningMotor.getPosition().getValueAsDouble()));
   }
 
   public void setDesiredState(SwerveModuleState desiredState) {
     var encoderRotation = Rotation2d.fromRotations(
-            turningEncoder.getAbsolutePosition().getValueAsDouble());
+            turningMotor.getPosition().getValueAsDouble());
 
     desiredState.optimize(encoderRotation);
     desiredState.cosineScale(encoderRotation);
@@ -157,7 +157,7 @@ public class SwerveModule extends SubsystemBase {
 
   public void latchPosition() {
     turningMotor.setControl(new PositionVoltage(
-            turningEncoder.getAbsolutePosition().getValueAsDouble()));
+            turningMotor.getPosition().getValueAsDouble()));
   }
 
   public void refreshPreferences() {

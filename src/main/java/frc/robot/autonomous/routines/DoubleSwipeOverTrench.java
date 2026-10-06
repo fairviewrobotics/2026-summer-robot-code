@@ -13,14 +13,11 @@ import frc.robot.commands.DriveToPointContinuous;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.SwerveConstants;
-import frc.robot.subsystems.Hood;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.*;
 import frc.robot.utils.AllianceFlipUtil;
 
 public class DoubleSwipeOverTrench extends SequentialCommandGroup {
-    public DoubleSwipeOverTrench(Swerve swerve, Shooter shooter, Hood hood, Intake intake) {
+    public DoubleSwipeOverTrench(Swerve swerve, Shooter shooter, Hood hood, Intake intake, Hopper hopper) {
         setName("BOX TEST");
         addCommands(
                 Commands.defer(() -> {
@@ -36,7 +33,7 @@ public class DoubleSwipeOverTrench extends SequentialCommandGroup {
                             ),
                             new DriveToPointContinuous(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_BUMP_LEFT_PASSAGE_POINT), SwerveConstants.MAX_SPEED),
                             new DriveToPoint(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_BUMP_LEFT_SHOOT_POINT), SwerveConstants.MAX_SPEED),
-                            new AimAtTarget(shooter, hood, swerve, () -> AllianceFlipUtil.apply(FieldConstants.BLUE_HUB_POSE3D.toPose2d()), () -> 0, () -> 0).withTimeout(5),
+                            new AimAtTarget(shooter, hood, swerve, hopper, () -> AllianceFlipUtil.apply(FieldConstants.BLUE_HUB_POSE3D.toPose2d()), () -> 0, () -> 0).withTimeout(5),
                             new DriveToPointContinuous(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_TRENCH_LEFT_TRANSITION_POINT), SwerveConstants.MAX_SPEED),
                             new DriveToPointContinuous(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_TRENCH_LEFT), SwerveConstants.MAX_SPEED),
                             new DriveToPointContinuous(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_TRENCH_LEFT_SECOND_SWIPE_START), SwerveConstants.MAX_SPEED),
@@ -47,7 +44,7 @@ public class DoubleSwipeOverTrench extends SequentialCommandGroup {
                             new DriveToPointContinuous(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_BUMP_LEFT_TRANSITION_POINT), SwerveConstants.MAX_SPEED),
                             new DriveToPointContinuous(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_BUMP_LEFT_PASSAGE_POINT), SwerveConstants.MAX_SPEED),
                             new DriveToPoint(swerve, AllianceFlipUtil.apply(FieldConstants.BLUE_BUMP_LEFT_SHOOT_POINT), SwerveConstants.MAX_SPEED),
-                            new AimAtTarget(shooter, hood, swerve, () -> AllianceFlipUtil.apply(FieldConstants.BLUE_HUB_POSE3D.toPose2d()), () -> 0, () -> 0)
+                            new AimAtTarget(shooter, hood, swerve, hopper, () -> AllianceFlipUtil.apply(FieldConstants.BLUE_HUB_POSE3D.toPose2d()), () -> 0, () -> 0)
                     );
                 }, Set.of(swerve, shooter, hood))
         );

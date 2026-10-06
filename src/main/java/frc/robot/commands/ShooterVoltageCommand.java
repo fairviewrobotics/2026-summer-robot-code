@@ -21,7 +21,6 @@ public class ShooterVoltageCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        shooterSubsystem.setLeftShooterMotorVoltage(0);
-        shooterSubsystem.setRightShooterMotorVoltage(0);
+        shooterSubsystem.stopMotors();
     }
 }

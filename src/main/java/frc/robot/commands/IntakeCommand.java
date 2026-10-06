@@ -17,8 +17,8 @@ public class IntakeCommand extends Command {
 
     @Override
     public void execute() {
-        intake.setDeployMotor(IntakeConstants.INTAKE_DEPLOY_POSITION);
-        intake.setIntakeRollerMotorVoltage(4.0);
+//        intake.setDeployMotor(IntakeConstants.INTAKE_DEPLOY_POSITION);
+        intake.setIntakeRollerMotorVoltage(-10.0);
     }
 
     @Override

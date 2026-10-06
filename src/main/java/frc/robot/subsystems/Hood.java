@@ -80,11 +80,18 @@ public class Hood extends SubsystemBase {
         hoodMotor.setVoltage(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), position));
     }
 
+    public boolean isAtPosition(double targetAngle, double toleranceRad) {
+        return Math.abs(hoodMotor.getEncoder().getPosition() - targetAngle) <= toleranceRad;
+    }
+
     public void setHoodVoltage(double voltage) {
         hoodMotor.setVoltage(voltage);
     }
 
     public void periodic() {
+        if (hoodMotor.getEncoder().getPosition() < 0) {
+            resetHoodPosition();
+        }
         Logger.recordOutput("Hood/HOOD_POSITION", hoodMotor.getEncoder().getPosition());
     }
 
