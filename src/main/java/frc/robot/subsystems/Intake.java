@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
     public Intake() {
         SparkFlexConfig rollerMotorConfig = new SparkFlexConfig();
         SparkFlexConfig deployMotorConfig = new SparkFlexConfig();
-        rollerMotorConfig.smartCurrentLimit(40);
+        rollerMotorConfig.smartCurrentLimit(60);
         rollerMotorConfig.idleMode(SparkBaseConfig.IdleMode.kCoast);
         rollerMotorConfig.inverted(false);
         leftRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

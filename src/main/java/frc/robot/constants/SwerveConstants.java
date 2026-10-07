@@ -22,7 +22,7 @@ public class SwerveConstants {
     public static final double TURNING_P = 80.0;
     public static final double TURNING_D = 0.5;
 
-    public static final double AUTO_ROTATION_P = 5.0;
+    public static final double AUTO_ROTATION_P = 0.5;
     public static final double AUTO_ROTATION_D = 0.0;
     public static final TrapezoidProfile.Constraints AUTO_ROTATION_CONSTRAINTS = new TrapezoidProfile.Constraints(2 * Math.PI, 4 * Math.PI);
 

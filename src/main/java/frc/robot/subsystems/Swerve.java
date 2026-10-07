@@ -82,14 +82,13 @@ public class Swerve extends SubsystemBase {
                 this::getRobotRelativeSpeeds,
                 this::driveRobotRelative,
                 new PPHolonomicDriveController(
-                        new PIDConstants(5.0, 0.0, SwerveConstants.AUTO_ROTATION_D),
-                        new PIDConstants(1.5, 0.0, SwerveConstants.AUTO_ROTATION_D)
+                        new PIDConstants(5.0, 0.0, 0.0),
+                        new PIDConstants(0.5, 0.0, 0.0)
                 ),
                 config,
                 AllianceFlipUtil::shouldFlip,
                 this
         );
-//        gyro.setAngleAdjustment(180);
     }
 
     private final SwerveDrivePoseEstimator poseEstimator =
