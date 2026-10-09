@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
     public Intake() {
         SparkFlexConfig rollerMotorConfig = new SparkFlexConfig();
         SparkFlexConfig deployMotorConfig = new SparkFlexConfig();
-        rollerMotorConfig.smartCurrentLimit(60);
+        rollerMotorConfig.smartCurrentLimit(40);
         rollerMotorConfig.idleMode(SparkBaseConfig.IdleMode.kCoast);
         rollerMotorConfig.inverted(false);
         leftRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -69,14 +69,18 @@ public class Intake extends SubsystemBase {
         double currentAngle = deployMotor.getEncoder().getPosition();
         deployMotor.setVoltage(deployPid.calculate(currentAngle, angle));
 
-        if (angle <= 0.0 || Math.abs(currentAngle) < 0.5) {
-            resetIntakeEncoder();
-        }
+//        if (angle <= 0.0 || Math.abs(currentAngle) < 0.5) {
+//            resetIntakeEncoder();
+//        }
     }
 
     private void initializePreferences() {
         Preferences.initDouble("Intake/kP", 0.0);
         Preferences.initDouble("Deploy/TARGET_ANGLE", 0.0);
+    }
+
+    public void resetDeployMotor() {
+        deployMotor.getEncoder().setPosition(0);
     }
 
     public void refreshPreferences() {
@@ -91,6 +95,9 @@ public class Intake extends SubsystemBase {
         Logger.recordOutput("Intake/DEPLOY_MOTOR_POSITION", deployMotor.getEncoder().getPosition());
         Logger.recordOutput("Intake/LEFT_ROLLOR_MOTOR_VELOCITY", leftRollerMotor.getEncoder().getVelocity());
         Logger.recordOutput("Intake/RIGHT_ROLLOR_MOTOR_VELOCITY", rightRollerMotor.getEncoder().getVelocity());
+//        if (deployMotor.getEncoder().getPosition() < 0) {
+//            resetDeployMotor();
+//        }
     }
 
 }

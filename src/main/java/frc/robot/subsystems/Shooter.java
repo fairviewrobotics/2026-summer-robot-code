@@ -141,6 +141,7 @@ public class Shooter extends SubsystemBase {
         filteredError = errorFilter.calculate(
                 Math.abs(ShooterPID.getError())
         );
+
         Logger.recordOutput("Shooter/FFOutput", ShooterFF.calculate(Preferences.getDouble("Shooter/RPM_SETPOINT", 0.0)));
 
         Logger.recordOutput("Shooter/LEFT_MOTOR_RPM", leftShooterMotor.getEncoder().getVelocity());

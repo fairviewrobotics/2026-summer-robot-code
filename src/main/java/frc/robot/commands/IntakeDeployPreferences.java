@@ -19,12 +19,10 @@ public class IntakeDeployPreferences extends Command {
     @Override
     public void execute() {
         intake.setDeployMotor(Preferences.getDouble("Deploy/TARGET_ANGLE", 0.0));
-        intake.setIntakeRollerMotorVoltage(-8);
     }
 
     @Override
     public void end(boolean interrupted) {
-        intake.setDeployMotor(0.0);
-        intake.setIntakeRollerMotorVoltage(0);
+//        intake.setDeployMotor(0.0);
     }
 }

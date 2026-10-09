@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.RefreshPreferences;
+import frc.robot.subsystems.*;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -26,6 +28,12 @@ public class Robot extends LoggedRobot
   private        Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+//  Swerve swerve = new Swerve();
+//  Intake intake = new Intake();
+//  Shooter shooter = new Shooter();
+//  Hood hood = new Hood();
+//  Kicker kicker = new Kicker();
+//
 
   private Timer disabledTimer;
   public Robot()
@@ -142,6 +150,9 @@ public class Robot extends LoggedRobot
     {
       CommandScheduler.getInstance().cancelAll();
     }
+
+//    new RefreshPreferences(swerve, intake, shooter, hood, kicker);
+
   }
 
   /**

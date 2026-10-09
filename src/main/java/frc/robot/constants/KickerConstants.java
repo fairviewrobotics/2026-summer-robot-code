@@ -6,7 +6,7 @@ public class KickerConstants {
     public static final double DEFAULT_KP = 0;
     public static final double DEFAULT_KD = 0;
     public static final double DEFAULT_KI = 0;
-    public static final double DEFAULT_KS = 0;
-    public static final double DEFAULT_KV = 0;
+    public static final double DEFAULT_KS = 0.25;
+    public static final double DEFAULT_KV = 0.025;
     public static final double SHOOTER_RPM = 0;
 }

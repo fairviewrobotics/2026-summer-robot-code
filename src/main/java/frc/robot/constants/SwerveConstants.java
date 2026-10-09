@@ -22,9 +22,9 @@ public class SwerveConstants {
     public static final double TURNING_P = 80.0;
     public static final double TURNING_D = 0.5;
 
-    public static final double AUTO_ROTATION_P = 0.5;
+    public static final double AUTO_ROTATION_P = 5.0;
     public static final double AUTO_ROTATION_D = 0.0;
-    public static final TrapezoidProfile.Constraints AUTO_ROTATION_CONSTRAINTS = new TrapezoidProfile.Constraints(2 * Math.PI, 4 * Math.PI);
+    public static final TrapezoidProfile.Constraints AUTO_ROTATION_CONSTRAINTS = new TrapezoidProfile.Constraints(4 * Math.PI, 8 * Math.PI);
 
     public static final String FRONT_LEFT_MODULE_NAME = "FRONT_LEFT";
     public static final String FRONT_RIGHT_MODULE_NAME = "FRONT_RIGHT";
@@ -77,10 +77,10 @@ public class SwerveConstants {
     public static final Translation2d BACK_RIGHT_MODULE_POSE = new Translation2d(BACK_RIGHT_OFFSET_X, BACK_RIGHT_OFFSET_Y);
 
     // Absolute Encoder Offsets
-    public static final double FRONT_LEFT_ENCODER_OFFSET = 3.105;
-    public static final double FRONT_RIGHT_ENCODER_OFFSET = 2.752;
-    public static final double BACK_LEFT_ENCODER_OFFSET = 1.401;
-    public static final double BACK_RIGHT_ENCODER_OFFSET = 2.493;
+    public static final double FRONT_LEFT_ENCODER_OFFSET = 2.932;
+    public static final double FRONT_RIGHT_ENCODER_OFFSET = 2.658;
+    public static final double BACK_LEFT_ENCODER_OFFSET = 1.039;
+    public static final double BACK_RIGHT_ENCODER_OFFSET = 2.534;
 
     // --- Module Configurations ---
 

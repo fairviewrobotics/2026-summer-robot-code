@@ -14,12 +14,12 @@ public class ShootingConstants {
     public static final double HOOD_MAX_ANGLE_DEGREES = 90.0;
     public static final double HOOD_MIN_ANGLE_DEGREES = 0.0;
 
-    public static final double DEFAULT_KP = 0.1;
+    public static final double DEFAULT_KP = 0.0015;
     public static final double DEFAULT_KI = 0.0;
     public static final double DEFAULT_KD = 0.0;
 
-    public static final double DEFAULT_KV = 0.115;
-    public static final double DEFAULT_KS = 0.2;
+    public static final double DEFAULT_KV = 0.0017;
+    public static final double DEFAULT_KS = 0.4;
 
 
     public static final double SHOOTER_RPM = 2500;

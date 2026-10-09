@@ -52,7 +52,8 @@ public class Kicker extends SubsystemBase {
     }
 
     public boolean isAtRPM(double targetRPM, double toleranceRPM) {
-        return Math.abs(kickerMotor1.getVelocity().getValueAsDouble() - targetRPM) <= toleranceRPM;
+        double currentRPM = kickerMotor1.getVelocity().getValueAsDouble() * 60.0;
+        return Math.abs(currentRPM - targetRPM) <= toleranceRPM;
     }
 
     public void setRPM(double RPM){

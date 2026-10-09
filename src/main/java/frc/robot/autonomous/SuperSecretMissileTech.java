@@ -1,6 +1,7 @@
 package frc.robot.autonomous;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,9 +23,9 @@ public class SuperSecretMissileTech {
             superSecretMissileTech.setDefaultOption("NOTHING", new SequentialCommandGroup());
         }
         superSecretMissileTech.addOption("NOTHING", new SequentialCommandGroup());
+        superSecretMissileTech.addOption("LET CHOPPED DOUBLE SWIPE", new PathPlannerAuto("Left Chopped Double Swipe", false));
+        superSecretMissileTech.addOption("RIGHT CHOPPED DOUBLE SWIPE", new PathPlannerAuto("Left Chopped Double Swipe", true));
         superSecretMissileTech.addOption("BOX TEST", new BoxTest(swerve));
-        superSecretMissileTech.addOption("BAD DOUBLE SWIPE", new BadDoubleSwiple(swerve, hood, shooter, intake, hopper));
-        superSecretMissileTech.addOption("DOUBLE SWIPE", new DoubleSwipeOverTrench(swerve, shooter, hood, intake, hopper));
         SmartDashboard.putData("Autonomous Selector", superSecretMissileTech);
     }
 

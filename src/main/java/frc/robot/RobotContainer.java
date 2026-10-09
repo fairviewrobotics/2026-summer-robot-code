@@ -3,14 +3,22 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import choreo.auto.AutoChooser;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autonomous.SuperSecretMissileTech;
 import frc.robot.commands.*;
+import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.*;
+import frc.robot.utils.AllianceFlipUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -29,7 +37,7 @@ public class RobotContainer
     private final Hood hood = new Hood();
     private final Intake intake = new Intake();
     private final Hopper hopper = new Hopper();
-    private final SuperSecretMissileTech superSecretMissileTech = new SuperSecretMissileTech(swerve, hood, shooter, intake, hopper);
+    private final SuperSecretMissileTech superSecretMissileTech;
     private final Vision vision = new Vision(swerve);
 
     /**
@@ -37,6 +45,14 @@ public class RobotContainer
      */
     public RobotContainer()
     {
+        NamedCommands.registerCommand("AimAtTarget", new AimAtTarget(shooter, hood, swerve, kicker, hopper, intake, () -> AllianceFlipUtil.apply(FieldConstants.BLUE_HUB_POSE3D.toPose2d()), () -> 0.0, () -> 0.0));
+        NamedCommands.registerCommand("Intake", new IntakeCommand(intake));
+        NamedCommands.registerCommand("IntakeDeploy", new IntakeDeployVoltageCommand(intake,4.0).withTimeout(2.0));
+        NamedCommands.registerCommand("ResetGyro", new InstantCommand(swerve::resetGyro));
+
+
+        superSecretMissileTech = new SuperSecretMissileTech(swerve, hood, shooter, intake, hopper);
+
         configureBindings();
         DriverStation.silenceJoystickConnectionWarning(true);
     }
@@ -55,23 +71,27 @@ public class RobotContainer
         swerve.setDefaultCommand(
                 new Drive(
                         swerve,
-                        primary_controller::getLeftX,
-                        primary_controller::getLeftY,
-                        primary_controller::getRightX
+                        () -> -primary_controller.getLeftY(),
+                        () -> -primary_controller.getLeftX(),
+                        () -> -primary_controller.getRightX()
                 )
         );
         primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
-        primary_controller.L2().whileTrue(new IntakeRollerVoltageCommand(intake, 8));
-        primary_controller.R3().whileTrue(new RunCommand(swerve.xWheels()));
+        primary_controller.L2().whileTrue(new IntakeRollerVoltageCommand(intake, 6));
+        primary_controller.R2().whileTrue(new AimAtTarget(shooter, hood, swerve, kicker, hopper, intake, () -> AllianceFlipUtil.apply(FieldConstants.BLUE_HUB_POSE3D.toPose2d()), () -> 0.0, () -> 0.0));
+        primary_controller.R3().whileTrue(new RunCommand(swerve::xWheels, swerve));
         secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve, intake, shooter, hood, kicker));
-        secondary_controller.b().whileTrue(new IntakeDeployVoltageCommand(intake,8.0));
-        secondary_controller.leftBumper().whileTrue(new IntakeDeployPreferences(intake));
+        secondary_controller.leftStick().onTrue(new InstantCommand(intake::resetDeployMotor, intake));
+        secondary_controller.b().whileTrue(new IntakeDeployVoltageCommand(intake,6.0));
+        secondary_controller.a().whileTrue(new AgitateIntakeCommand(intake));
+        secondary_controller.leftBumper().whileTrue(new IntakeRollerVoltageCommand(intake, -12.0));
         secondary_controller.rightBumper().whileTrue(new ShooterPreferencesCommand(shooter));
-        secondary_controller.x().whileTrue(new HopperCommand(hopper,-6.0));
+        secondary_controller.x().whileTrue(new IntakeDeployVoltageCommand(intake,-6.0));
         secondary_controller.y().whileTrue(new KickerWithRPM(kicker));
         secondary_controller.rightTrigger().whileTrue(new HoodPreferencesCommand(hood));
 
     }
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
