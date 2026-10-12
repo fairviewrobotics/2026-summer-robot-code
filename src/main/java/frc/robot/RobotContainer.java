@@ -77,7 +77,8 @@ public class RobotContainer
                 )
         );
         primary_controller.options().onTrue(new InstantCommand(swerve::zeroGyro));
-        primary_controller.L2().whileTrue(new IntakeRollerVoltageCommand(intake, 6));
+        primary_controller.L1().whileTrue(new PassCommand(shooter, kicker, hood, hopper));
+        primary_controller.L2().whileTrue(new IntakeCommand(intake));
         primary_controller.R2().whileTrue(new AimAtTarget(shooter, hood, swerve, kicker, hopper, intake, () -> AllianceFlipUtil.apply(FieldConstants.BLUE_HUB_POSE3D.toPose2d()), () -> 0.0, () -> 0.0));
         primary_controller.R3().whileTrue(new RunCommand(swerve::xWheels, swerve));
         secondary_controller.rightStick().onTrue(new RefreshPreferences(swerve, intake, shooter, hood, kicker));
@@ -89,6 +90,7 @@ public class RobotContainer
         secondary_controller.x().whileTrue(new IntakeDeployVoltageCommand(intake,-6.0));
         secondary_controller.y().whileTrue(new KickerWithRPM(kicker));
         secondary_controller.rightTrigger().whileTrue(new HoodPreferencesCommand(hood));
+        secondary_controller.pov(90).whileTrue(new HopperCommand(hopper, 6));
 
     }
 

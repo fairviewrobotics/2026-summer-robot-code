@@ -93,39 +93,43 @@ public class AimAtTarget extends Command {
         shooter.setMotorRPM(RPM);
         hood.setHoodPosition(angle);
 
-        boolean shooterReady = shooter.isAtRPM(RPM, 300.0);
-        boolean hoodReady = hood.isAtPosition(angle, 0.02);
+        boolean shooterReady = shooter.isAtRPM(RPM, 500.0);
+        //boolean hoodReady = hood.isAtPosition(angle, 0.02);
         boolean swerveReady = rotationPID.atSetpoint();
         boolean driverTranslating = (Math.abs(xParam) > 0.01) || (Math.abs(yParam) > 0.01);
 
-        if (swerveReady && !driverTranslating) {
+        if (swerveReady) {
             swerve.xWheels();
         } else {
             swerve.drive(xParam, yParam, rotationOutput);
         }
 
         Logger.recordOutput("AimAtTarget/ShooterReady", shooterReady);
-        Logger.recordOutput("AimAtTarget/HoodReady", hoodReady);
+        //Logger.recordOutput("AimAtTarget/HoodReady", hoodReady);
         Logger.recordOutput("AimAtTarget/SwerveReady", swerveReady);
 
-        boolean targetReady = shooterReady && hoodReady && swerveReady;
+        //boolean targetReady = shooterReady && hoodReady && swerveReady;
+        boolean targetReady = shooterReady && swerveReady;
 
         if (kicker != null) {
             double kickerRPM = Preferences.getDouble("Kicker/RPM_SETPOINT", KickerConstants.SHOOTER_RPM);
             if (targetReady) {
                 kicker.setRPM(kickerRPM);
+                hopper.setHopperRightMotorVoltage(6);
+//                intake.setDeployMotor(4.0);
+//                intake.setIntakeRollerMotorVoltage(6);
+
             } else {
                 kicker.RunWithVoltage(0.0);
+                hopper.setLeftHopperMotorVoltage(-6.0);
+                hopper.setHopperRightMotorVoltage(6.0);
             }
 
             boolean kickerReady = targetReady && kickerRPM > 10.0 && kicker.isAtRPM(kickerRPM, 500.0);
             Logger.recordOutput("AimAtTarget/KickerReady", kickerReady);
 
+
             if (kickerReady) {
-                if (hopper != null) {
-                    hopper.setHopperRightMotorVoltage(6.0);
-                    hopper.setLeftHopperMotorVoltage(-6.0);
-                }
                 if (intake != null) {
                     double amplitude = Preferences.getDouble("AgitateIntake/AmplitudeVolts", 3.0);
                     double frequency = Preferences.getDouble("AgitateIntake/FrequencyHz", 2.0);
@@ -134,10 +138,6 @@ public class AimAtTarget extends Command {
                     Logger.recordOutput("AimAtTarget/AgitateVoltage", agitateVoltage);
                 }
             } else {
-                if (hopper != null) {
-                    hopper.setHopperRightMotorVoltage(0.0);
-                    hopper.setLeftHopperMotorVoltage(0.0);
-                }
                 if (intake != null) {
                     intake.setDeployMotorVoltage(0.0);
                 }
@@ -159,6 +159,7 @@ public class AimAtTarget extends Command {
         if (intake != null) {
             intake.setDeployMotorVoltage(0.0);
         }
+
         agitateTimer.stop();
     }
 

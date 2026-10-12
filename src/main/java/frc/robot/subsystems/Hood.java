@@ -1,20 +1,13 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ShootingConstants;
@@ -22,28 +15,36 @@ import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
 
-    public SparkFlex hoodMotor = new SparkFlex(ShootingConstants.HOOD_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-    public SparkFlexConfig hoodMotorConfig = new SparkFlexConfig();
+    public final TalonFX hoodMotor = new TalonFX(ShootingConstants.HOOD_MOTOR_ID);
 
-    private final InterpolatingDoubleTreeMap DistanceToAngle =
-            new InterpolatingDoubleTreeMap();
+    private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
+    private final VoltageOut voltageRequest = new VoltageOut(0);
+    private final NeutralOut neutralRequest = new NeutralOut();
 
-    private PIDController hoodPID = new PIDController(0.0, 0.0, 0.0);
+    private final InterpolatingDoubleTreeMap DistanceToAngle = new InterpolatingDoubleTreeMap();
+
+    // HOOD_CONVERSION_FACTOR = hood units (rad) per motor rotation, same as the old Spark config
+    private static final double UNITS_PER_ROTATION = ShootingConstants.HOOD_CONVERSION_FACTOR;
+
+    private final TalonFXConfiguration config = new TalonFXConfiguration();
 
     public Hood() {
         initializePreferences();
+
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // old: inverted(false)
+
+        config.CurrentLimits.StatorCurrentLimit = 20;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+
+        // Slot0 gains are volts per ROTOR ROTATION of error, so convert from per-radian gains
+        config.Slot0.kP = Preferences.getDouble("Hood/kP", 0.0) * UNITS_PER_ROTATION;
+        config.Slot0.kD = Preferences.getDouble("Hood/kD", 0.0) * UNITS_PER_ROTATION;
+
+        hoodMotor.getConfigurator().apply(config);
+
         resetHoodPosition();
-
-        hoodMotorConfig.smartCurrentLimit(20);
-
-        hoodMotorConfig.encoder.positionConversionFactor(ShootingConstants.HOOD_CONVERSION_FACTOR);
-
-        hoodMotorConfig.inverted(false);
-        hoodMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-
-        hoodMotor.configure(hoodMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         createDistanceToAngleMap();
-        hoodPID.setTolerance(0.01);
     }
 
     private void initializePreferences() {
@@ -65,79 +66,61 @@ public class Hood extends SubsystemBase {
     }
 
     public void updatePreferences() {
-        hoodPID.setP(Preferences.getDouble("Hood/kP", 0.0));
-        hoodPID.setD(Preferences.getDouble("Hood/kD", 0.0));
+        config.Slot0.kP = Preferences.getDouble("Hood/kP", 0.0) * UNITS_PER_ROTATION;
+        config.Slot0.kD = Preferences.getDouble("Hood/kD", 0.0) * UNITS_PER_ROTATION;
+        hoodMotor.getConfigurator().apply(config.Slot0);
         createDistanceToAngleMap();
     }
 
-
-    /**
-     *
-     * @param position in radians
-     */
-
+    /** @param position target in hood units (rad) */
     public void setHoodPosition(double position) {
-        hoodMotor.setVoltage(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), position));
+        hoodMotor.setControl(positionRequest.withPosition(position / UNITS_PER_ROTATION));
+    }
+
+    public double getHoodPosition() {
+        return hoodMotor.getPosition().getValueAsDouble() * UNITS_PER_ROTATION;
     }
 
     public boolean isAtPosition(double targetAngle, double toleranceRad) {
-        return Math.abs(hoodMotor.getEncoder().getPosition() - targetAngle) <= toleranceRad;
+        return Math.abs(getHoodPosition() - targetAngle) <= toleranceRad;
     }
 
     public void setHoodVoltage(double voltage) {
-        hoodMotor.setVoltage(voltage);
-    }
-
-    public void periodic() {
-        if (hoodMotor.getEncoder().getPosition() < 0) {
-            resetHoodPosition();
-        }
-        Logger.recordOutput("Hood/HOOD_POSITION", hoodMotor.getEncoder().getPosition());
+        hoodMotor.setControl(voltageRequest.withOutput(voltage));
     }
 
     public void stopHood() {
-        hoodMotor.stopMotor();
+        hoodMotor.setControl(neutralRequest);
     }
 
-    public void setVoltage(double voltage) {hoodMotor.setVoltage(voltage);}
-
     public void resetHoodPosition() {
-        hoodMotor.getEncoder().setPosition(0);
+        hoodMotor.setPosition(0);
+    }
+
+    @Override
+    public void periodic() {
+        if (getHoodPosition() < 0) {
+            resetHoodPosition();
+        }
+        Logger.recordOutput("Hood/HOOD_POSITION", getHoodPosition());
     }
 
     // Distance (m), Hood Angle (rad)
     private void createDistanceToAngleMap() {
         DistanceToAngle.clear();
-        DistanceToAngle.put(
-                Preferences.getDouble("Hood_Map/DIST_MAP_ONE", 0.0),
-                Preferences.getDouble("Hood_Map/ANGLE_MAP_ONE", 10.0)
-        );
-        DistanceToAngle.put(
-                Preferences.getDouble("Hood_Map/DIST_MAP_TWO", 3.0796),
-                Preferences.getDouble("Hood_Map/ANGLE_MAP_TWO", 20.0)
-        );
-        DistanceToAngle.put(
-                Preferences.getDouble("Hood_Map/DIST_MAP_THREE", 4.1596),
-                Preferences.getDouble("Hood_Map/ANGLE_MAP_THREE", 0.0)
-        );
-        DistanceToAngle.put(
-                Preferences.getDouble("Hood_Map/DIST_MAP_FOUR", 5.1396),
-                Preferences.getDouble("Hood_Map/ANGLE_MAP_FOUR", 0.0)
-        );
-        DistanceToAngle.put(
-                Preferences.getDouble("Hood_Map/DIST_MAP_FIVE", 6.0),
-                Preferences.getDouble("Hood_Map/ANGLE_MAP_FIVE", 80.0)
-        );
+        DistanceToAngle.put(Preferences.getDouble("Hood_Map/DIST_MAP_ONE", 0.0),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_ONE", 10.0));
+        DistanceToAngle.put(Preferences.getDouble("Hood_Map/DIST_MAP_TWO", 3.0796),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_TWO", 20.0));
+        DistanceToAngle.put(Preferences.getDouble("Hood_Map/DIST_MAP_THREE", 4.1596),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_THREE", 0.0));
+        DistanceToAngle.put(Preferences.getDouble("Hood_Map/DIST_MAP_FOUR", 5.1396),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_FOUR", 0.0));
+        DistanceToAngle.put(Preferences.getDouble("Hood_Map/DIST_MAP_FIVE", 6.0),
+                Preferences.getDouble("Hood_Map/ANGLE_MAP_FIVE", 80.0));
     }
 
-    public double getDistanceToAngle(double distance){
+    public double getDistanceToAngle(double distance) {
         return DistanceToAngle.get(distance);
     }
-
-    public void setVoltage(Double voltage) {
-        hoodMotor.setVoltage(voltage);
-    }
-
-
-
 }

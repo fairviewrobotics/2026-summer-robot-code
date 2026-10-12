@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.CoastOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -10,37 +8,46 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
+
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IntakeConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
-    SparkFlex leftRollerMotor = new SparkFlex(IntakeConstants.INTAKE_LEFT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-    SparkFlex rightRollerMotor = new SparkFlex(IntakeConstants.INTAKE_RIGHT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+    TalonFX leftRollerMotor = new TalonFX(IntakeConstants.INTAKE_LEFT_MOTOR_ID);
+    TalonFX rightRollerMotor = new TalonFX(IntakeConstants.INTAKE_RIGHT_MOTOR_ID);
+    TalonFXConfiguration leftRollerConfig = new TalonFXConfiguration();
+    TalonFXConfiguration rightRollerConfig = new TalonFXConfiguration();
+
     SparkFlex deployMotor = new SparkFlex(IntakeConstants.INTAKE_DEPLOY_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
     PIDController deployPid = new PIDController(5.0, 0.0, 0.0);
 
     public Intake() {
-        SparkFlexConfig rollerMotorConfig = new SparkFlexConfig();
+        // Left roller
+        leftRollerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        leftRollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        leftRollerConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        leftRollerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+        // Right roller (inverted)
+        rightRollerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        rightRollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        rightRollerConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        rightRollerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+        leftRollerMotor.getConfigurator().apply(leftRollerConfig);
+        rightRollerMotor.getConfigurator().apply(rightRollerConfig);
+
+        // Deploy (Vortex, unchanged)
         SparkFlexConfig deployMotorConfig = new SparkFlexConfig();
-        rollerMotorConfig.smartCurrentLimit(40);
-        rollerMotorConfig.idleMode(SparkBaseConfig.IdleMode.kCoast);
-        rollerMotorConfig.inverted(false);
-        leftRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        rollerMotorConfig.inverted(true);
-        rightRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         deployMotorConfig.smartCurrentLimit(40);
         deployMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         deployMotorConfig.inverted(true);
-
         deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         deployMotor.getEncoder().setPosition(0);
 
@@ -61,17 +68,11 @@ public class Intake extends SubsystemBase {
     }
 
     /**
-     *
      * @param angle target angle in radians. 0 is hard stop, + is CCW
      */
-
     public void setDeployMotor(double angle) {
         double currentAngle = deployMotor.getEncoder().getPosition();
         deployMotor.setVoltage(deployPid.calculate(currentAngle, angle));
-
-//        if (angle <= 0.0 || Math.abs(currentAngle) < 0.5) {
-//            resetIntakeEncoder();
-//        }
     }
 
     private void initializePreferences() {
@@ -87,17 +88,15 @@ public class Intake extends SubsystemBase {
         deployPid.setP(Preferences.getDouble("Intake/kP", 0.0));
     }
 
-    public void resetPID(){
+    public void resetPID() {
         deployPid.reset();
     }
 
-    public void periodic(){
+    @Override
+    public void periodic() {
         Logger.recordOutput("Intake/DEPLOY_MOTOR_POSITION", deployMotor.getEncoder().getPosition());
-        Logger.recordOutput("Intake/LEFT_ROLLOR_MOTOR_VELOCITY", leftRollerMotor.getEncoder().getVelocity());
-        Logger.recordOutput("Intake/RIGHT_ROLLOR_MOTOR_VELOCITY", rightRollerMotor.getEncoder().getVelocity());
-//        if (deployMotor.getEncoder().getPosition() < 0) {
-//            resetDeployMotor();
-//        }
+        // TalonFX velocity is rotations/sec; *60 gives RPM like the Spark encoder did
+        Logger.recordOutput("Intake/LEFT_ROLLOR_MOTOR_VELOCITY", leftRollerMotor.getVelocity().getValueAsDouble() * 60.0);
+        Logger.recordOutput("Intake/RIGHT_ROLLOR_MOTOR_VELOCITY", rightRollerMotor.getVelocity().getValueAsDouble() * 60.0);
     }
-
 }
